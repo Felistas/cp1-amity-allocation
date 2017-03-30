@@ -1,9 +1,13 @@
 class Amity:
+    person = []
+    rooms = []
+    # allocations = {room_object: []}
+
     def create_room(self,name,type):
-        return 'Created room successfully'
+        pass
     def add_person(self,name,role,accommodation):
-        return 'Added person successfully'
-    def reallocate_person(self):
+        pass
+    def reallocate_person(self,name,room):
         pass
     def load_people(self):
         pass
