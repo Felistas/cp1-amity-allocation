@@ -1,13 +1,15 @@
 class Amity:
     person = []
-    rooms = []
-    # allocations = {room_object: []}
+    office = {}
+    living_space = {}
+    office_waitiing_list = []
+    living_space_waitiing_list = []
 
-    def create_room(self,name,type):
+    def create_room(self, room_name, room_type):
         pass
-    def add_person(self,name,role,accommodation):
+    def add_person(self, first_name, last_name, accommodation):
         pass
-    def reallocate_person(self,name,room):
+    def reallocate_person(self, person_id, new_room_name):
         pass
     def load_people(self):
         pass
