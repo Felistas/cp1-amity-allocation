@@ -69,27 +69,27 @@ class ModelsTest(unittest.TestCase):
 
     def test_reallocate_person(self):
         """Asserts that person has been reallocated successfully"""
-        msg_reallocate = self.amity.reallocate_person('shera','state')
+        msg_reallocate = self.amity.reallocate_person('001','state')
         msg_reallocate = self.assertEqual(msg_reallocate,"Reallocated person successfully")
 
     def test_reallocate_to_ghost_room(self):
         """Asserts that one cannot allocate a non-existent room"""
-        msg_reallocate = self.amity.reallocate_person('shera','camelot')
+        msg_reallocate = self.amity.reallocate_person('001','camelot')
         msg_reallocate = self.assertEqual(msg_reallocate,"Room does not exist")
 
     def test_reallocate_to_full_room(self):
         """Asserts that a person cannot be reallocated to a full room"""
-        msg_reallocate = self.amity.reallocate_person('shera','tsavo')
+        msg_reallocate = self.amity.reallocate_person('001','tsavo')
         msg_reallocate = self.assertEqual(msg_reallocate,"No space available")
 
     def test_cannot_reallocate_same_room(self):
         """Asserts that a person cannot be reallocated in the same room"""
-        msg_reallocate = self.amity.reallocate_person("shera","tsavo")
+        msg_reallocate = self.amity.reallocate_person("001","tsavo")
         msg_reallocate = self.assertEqual(msg_reallocate,"Cannot reallocate a person in the same room")
 
     def test_cannot_reallocate_staff(self):
         """Asserts that a staff cannot be reallocated from office to livingspace"""
-        msg_reallocate = self.amity.reallocate_person("john","oculus")
+        msg_reallocate = self.amity.reallocate_person("002","oculus")
         msg_reallocate = self.assertEqual(msg_reallocate,"Staff cannot be reallocated to livingspace")
 
     def test_print_allocated_rooms(self):
