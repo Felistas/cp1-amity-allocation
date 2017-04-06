@@ -1,32 +1,16 @@
 import unittest
-from person import Person,Fellow,Staff
-from room import Room,LivingSpace,Office
+from person import Fellow,Staff
+from room import LivingSpace,Office
 from amity import Amity
 
 class ModelsTest(unittest.TestCase):
     def setUp(self):
             self.amity = Amity()
-            self.person = Person("felistas","ngumi")
             self.fellow = Fellow("shera","ann")
             self.staff = Staff("john","ngumi")
-            self.room = Room("lion")
             self.office = Office("tsavo")
             self.livingspace = LivingSpace("oculus")
-    def test_fellow_inherits_person(self):
-        """ Checks if class Fellow inherits class Person"""
-        self.assertTrue(issubclass(Fellow,Person))
 
-    def test_staff_inherits_Person(self):
-        """Checks if class Staff Inherits class Person"""
-        self.assertTrue(issubclass(Staff,Person))
-
-    def test_livingspace_inherits_room(self):
-        """ Checks if class LivingSpace inherits class Room"""
-        self.assertTrue(issubclass(LivingSpace,Room))
-
-    def test_office_inherits_room(self):
-        """Checks if class Office Inherits class Room"""
-        self.assertTrue(issubclass(Office,Room))
 
     def test_room_exists(self):
         """Asserts tsavo exists in rooms"""
@@ -94,9 +78,8 @@ class ModelsTest(unittest.TestCase):
 
     def test_print_allocated_rooms(self):
         """Asserts that allocated rooms are printed"""
-        msg_allocations = self.amity.allocations
+        msg_allocations = self.amity.print_allocation
         self.assertTrue(msg_allocations,"List of allocated rooms")
-
     def test_print_unallocated_rooms(self):
         """Asserts that unallocated rooms are printed"""
         msg_unallocated = self.amity.print_unallocated

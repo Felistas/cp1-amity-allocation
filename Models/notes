@@ -1,0 +1,4 @@
+Having class person and room being able to be instantiated shows not using the concept of abstraction in OOP,
+check oout abc and ABCMeta classes.
+
+test naming conventionns - use format test_<function-name>_<edge_case>
