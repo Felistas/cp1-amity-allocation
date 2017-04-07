@@ -4,8 +4,8 @@ This example uses docopt with the built in cmd module to demonstrate an
 interactive command application.
 
 Usage:
-    Amity create_room <room_type> <room_name>
-    Amity add_person <role> <first_name> <last_name> [<accommodation>]
+    Amity create_room (office|livingspace) <room_name>
+    Amity add_person (fellow|staff) <first_name> <last_name> [<accommodation>]
     Amity reallocate_person <person_identifier> <new_room_name>
     Amity load_people
     Amity print_allocations [-o=filename]
@@ -63,13 +63,24 @@ class Amityapp (cmd.Cmd):
 
     @docopt_cmd
     def do_create_room(self, arg):
-        """Usage: create_room <room_type> <room_name>..."""
-        self.amity.create_room(arg['<room_type>'],arg['<room_name>'])
+        """Usage: create_room (office|livingspace) <room_name>..."""
+        room_type = None
+        if arg["office"]:
+            room_type = "office"
+        elif arg["livingspace"]:
+            room_type = "livingspace"
+
+        self.amity.create_room(room_type, arg['<room_name>'])
 
     @docopt_cmd
     def do_add_person(self, arg):
-        """Usage: add_person <role> <first_name> <last_name> [<accommodation>]"""
-        self.amity.add_person(arg['<role>'],arg['<first_name>'],arg['<last_name>'],arg['<accommodation>'])
+        """Usage: add_person (fellow|staff) <first_name> <last_name> [<accommodation>]"""
+        role = None
+        if arg["fellow"]:
+            role = "fellow"
+        elif arg["staff"]:
+            role = "staff"
+        self.amity.add_person(role,arg['<first_name>'],arg['<last_name>'],arg['<accommodation>'])
 
     def do_quit(self, arg):
         """Quits out of Interactive Mode."""
