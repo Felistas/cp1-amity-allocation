@@ -13,21 +13,33 @@ class Amity:
                 rooms = self.rooms['living_space'] + self.rooms['office']
                 check_room = [room.room_name for room in rooms if room.room_name == room_name]
                 if check_room:
-                    print ('The room already exists')
+                    print ('{} already exists'.format(room_name))
                 else:
                     if room_type == 'OFFICE':
                         room = Office(room_name)
-                        Amity.rooms['office'].append(room)
+                        self.rooms['office'].append(room)
                         print ('{} successfully created'.format(room_name))
                     elif room_type == 'LIVINGSPACE':
                         room = LivingSpace(room_name)
-                        Amity.rooms['living_space'].append(room)
+                        self.rooms['living_space'].append(room)
                         print ('{} successfully created'.format(room_name))
         else:
             print ('Invalid room type')
 
-    def add_person(self, first_name, last_name, accommodation):
-        pass
+    def add_person(self, role, first_name, last_name, accommodation):
+        role = role.upper()
+        first_name = first_name.upper()
+        last_name = last_name.upper()
+        accommodation = accommodation.upper()
+        if role == 'FELLOW':
+            fellow = Fellow(role,first_name,last_name,accommodation)
+            self.person.append(fellow)
+            print ('{} {} {} succefully added'.format(fellow.role,fellow.first_name,fellow.last_name))
+
+        elif role == 'STAFF':
+            staff = Staff(first_name,last_name,role,accommodation)
+            self.person.append(staff)
+            print ('{} {} {} succefully added'.format(role,first_name,last_name))
     def reallocate_person(self,person_id,new_room_name):
         pass
     def load_people(self):
@@ -42,9 +54,3 @@ class Amity:
         pass
     def load_state(self):
         pass
-
-
-# amity = Amity()
-# amity.create_room('tsavo',"office")
-# amity.create_room('tsao',"office")
-# print(amity.rooms)

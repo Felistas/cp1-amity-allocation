@@ -4,8 +4,8 @@ This example uses docopt with the built in cmd module to demonstrate an
 interactive command application.
 
 Usage:
-    Amity create_room <room_name> <room_type>
-    Amity add_person <person_name> <FELLOW|STAFF> [wants_accommodation]
+    Amity create_room <room_type> <room_name>
+    Amity add_person <role> <first_name> <last_name> [<accommodation>]
     Amity reallocate_person <person_identifier> <new_room_name>
     Amity load_people
     Amity print_allocations [-o=filename]
@@ -68,9 +68,8 @@ class Amityapp (cmd.Cmd):
 
     @docopt_cmd
     def do_add_person(self, arg):
-        """Usage: add_person <person_name> <FELLOW|STAFF> [wants_accommodation]"""
-
-        print(arg)
+        """Usage: add_person <role> <first_name> <last_name> [<accommodation>]"""
+        self.amity.add_person(arg['<role>'],arg['<first_name>'],arg['<last_name>'],arg['<accommodation>'])
 
     def do_quit(self, arg):
         """Quits out of Interactive Mode."""
