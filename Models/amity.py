@@ -1,4 +1,5 @@
 import random
+from tabulate import tabulate
 
 from Models.person import Fellow, Staff
 from Models.room import Office, LivingSpace
@@ -8,6 +9,7 @@ class Amity:
     rooms = {'living_space': {}, 'office': {}}
     office_waiting_list = []
     living_space_waiting_list = []
+
 
     def create_room(self, room_type, room_names):
         room_type = room_type.upper()
@@ -58,19 +60,19 @@ class Amity:
 
                 if allocated_room is None or len(allocated_room.persons) >= allocated_room.capacity:
                     # allocate to waiting list
-                    self.office_waiting_list.append(fellow)
-                    print('There are no rooms available. You have been added to the waiting list')
+                    self.living_space_waiting_list.append(fellow)
+                    print('There are no living spaces available. You have been added to the living space waiting list')
                 else:
                     # append person to office object
                     self.rooms['living_space'][allocated_room.name].persons += [fellow]
-                    print('You have been allocated to room ' + allocated_room.name)
+                    print('You have been allocated to living space ' + allocated_room.name)
 
             allocated_room = self.allocate_room("office")
 
             if allocated_room is None or len(allocated_room.persons) >= allocated_room.capacity:
                 # allocate to waiting list
                 self.office_waiting_list.append(fellow)
-                print('There are no offices available. You have been added to the waiting list')
+                print('There are no offices available. You have been added to the office waiting list')
             else:
                 # append person to office object
                 self.rooms['office'][allocated_room.name].persons += [fellow]
@@ -99,10 +101,16 @@ class Amity:
 
     def print_allocation(self):
         pass
-
-    def print_unallocated(self):
-        pass
-
+    def print_unallocated(self, filename=None):
+        #print people not allocated to office
+        print ("People not allocated to office \n")
+        unallocated_office_space = ['\n'.join (str(person.person_id) + ' ' + person.first_name + ' ' + person.last_name for person in Amity.office_waiting_list)]
+        print (tabulate(unallocated_office_space))
+        #print people not allocated to living space
+        print ("People not allocated to living space \n")
+        unallocated_living_space = ['\n'.join (str(person.person_id) + ' ' + person.first_name + ' ' + person.last_name for person in Amity.living_space_waiting_list)]
+        print (tabulate(unallocated_living_space))
+        
     def print_room(self):
         pass
 
