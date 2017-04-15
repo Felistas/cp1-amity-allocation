@@ -12,7 +12,7 @@ Usage:
     Amity print_unallocated [-o=filename]
     Amity print_room <room_name>
     Amity save_state [--db=sqlite_database]
-    Amity load_state <sqlite_database>
+    Amity load_state [--db=sqlite_database]
     Amity (-i | --interactive)
     Amity (-h | --help | --version)
 Options:
@@ -90,6 +90,16 @@ class Amityapp(cmd.Cmd):
     def do_print_unallocated(self, arg):
         """Usage: print_unallocated [--o=filename]"""
         print(self.amity.print_unallocated(arg['--o']))
+
+        @docopt_cmd
+    def do_save_state(self, args):
+        """Usage: save_state [--db=sqlite_database]"""
+        self.amity.save_state(args['--db'])
+
+        @docopt_cmd
+    def do_load_state(self, args):
+        """Usage: load_state [--db=sqlite_database]"""
+        self.amity.load_state(args['--db'])
 
     def do_quit(self, arg):
         """Quits out of Interactive Mode."""
