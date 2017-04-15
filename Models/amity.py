@@ -1,5 +1,7 @@
 import random
+import sqlite3
 from tabulate import tabulate
+
 
 from Models.person import Fellow, Staff
 from Models.room import Office, LivingSpace, Room
@@ -58,7 +60,7 @@ class Amity:
                 # allocate  an office selected at room
                 allocated_room = self.allocate_room("livingspace")
 
-                if allocated_room is None or len(allocated_room.occupants) == allocated_room.capacity:
+                if allocated_room is None or len(allocated_room.occupants) >= allocated_room.capacity:
                     # allocate to waiting list
                     self.living_space_waiting_list.append(fellow)
                     print(
@@ -72,7 +74,7 @@ class Amity:
 
             allocated_room = self.allocate_room("office")
 
-            if allocated_room is None or len(allocated_room.occupants) == allocated_room.capacity:
+            if allocated_room is None or len(allocated_room.occupants) >= allocated_room.capacity:
                 # allocate to waiting list
                 self.office_waiting_list.append(fellow)
                 print(
@@ -90,7 +92,7 @@ class Amity:
                 return
             else:
                 allocated_room = self.allocate_room("office")
-                if allocated_room is None or len(allocated_room.occupants) == allocated_room.capacity:
+                if allocated_room is None or len(allocated_room.occupants) >= allocated_room.capacity:
                     self.office_waiting_list.append(staff)
                     print(
                         'There are currently no offices. You have been added to the office waiting list')
@@ -105,26 +107,57 @@ class Amity:
     def load_people(self):
         pass
 
-    def print_allocation(self):
-        pass
+    def print_allocations(self, filename=None):
+        print('List of fellows with living space')
+        # for room in list(Amity.rooms['living_space'].keys()):
+        #     print(room)
+        for person in Room.occupants:
+
+            print(Room.occupants)
 
     def print_unallocated(self, filename=None):
         # print people not allocated to office
-        print("People not allocated to office \n")
-        unallocated_office_space = ['\n'.join(str(
-            person.person_id) + ' ' + person.first_name + ' ' + person.last_name for person in Amity.office_waiting_list)]
-        print(tabulate(unallocated_office_space))
-        # print people not allocated to living space
-        print("People not allocated to living space \n")
-        unallocated_living_space = ['\n'.join(str(
-            person.person_id) + ' ' + person.first_name + ' ' + person.last_name for person in Amity.living_space_waiting_list)]
-        print(tabulate(unallocated_living_space))
+        if len(Amity.office_waiting_list) == 0 and len(Amity.living_space_waiting_list) == 0:
+            print("Everyone within the system has an office or livingspace")
+        else:
+            print("People not allocated to office \n")
+            unallocated_office_space = ['\n'.join(str(
+                person.person_id) + ' ' + person.first_name + ' ' + person.last_name for person in Amity.office_waiting_list)]
+            print(tabulate(unallocated_office_space))
+            # print people not allocated to living space
+            print("People not allocated to living space \n")
+            unallocated_living_space = ['\n'.join(str(
+                person.person_id) + ' ' + person.first_name + ' ' + person.last_name for person in Amity.living_space_waiting_list)]
+            print(tabulate(unallocated_living_space))
 
-    def print_room(self):
-        pass
+    def print_all_livingspaces(self):
+        for room in list(Amity.rooms['living_space'].keys()):
+            print(room)
+
+    def print_all_offices(self):
+        for room in list(Amity.rooms['office'].keys()):
+            print(room)
 
     def save_state(self):
-        pass
+        # create database
+        conn = sqlite3.coonect('amity.db')
+        # create object to manage queries
+        curs = conn.Cursor()
+        curs.execute("CREATE TABLE IF NOT EXISTS data"
+                     "(aID INTEGER PRIMARY KEY UNIQUE,"
+                     "rooms TEXT, office_waiting_list TEXT, living_space_waiting_list TEXT, occupants TEXT)")
+        rooms = pickle.dumps(Amity.rooms)
+        occupants = pickle.dumps(Room.occupants)
+        office_waiting_list = pickle.dumps(Amity.office_waiting_list)
+        living_space_waiting_list = pickle.dumps(
+            Amity.living_space_waiting_list)
+
+        curs.execute("INSERT INTO data VALUES (null, ?, ?, ?, ?);",
+                     (all_rooms, all_persons, unallocated_office, unallocated_livingspace))
+
+        db_connect.commit()
+        db_connect.close()
+        return 'Data successfully exported to the Database'
 
     def load_state(self):
         pass

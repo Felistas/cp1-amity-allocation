@@ -78,13 +78,18 @@ class Amityapp(cmd.Cmd):
             role = "fellow"
         elif arg["staff"]:
             role = "staff"
-        self.amity.add_person(role, arg['<first_name>'], arg['<last_name>'], arg['<accommodation>'])
+        self.amity.add_person(
+            role, arg['<first_name>'], arg['<last_name>'], arg['<accommodation>'])
+
+    @docopt_cmd
+    def do_print_allocations(self, arg):
+        """Usage: print_allocations [--o=filename]"""
+        print(self.amity.print_allocations(arg['--o']))
 
     @docopt_cmd
     def do_print_unallocated(self, arg):
         """Usage: print_unallocated [--o=filename]"""
         print(self.amity.print_unallocated(arg['--o']))
-
 
     def do_quit(self, arg):
         """Quits out of Interactive Mode."""
@@ -103,8 +108,6 @@ if opt['--interactive']:
     #     a.add_person("fellow", "shera" + str(x), "ngumi", 'Y')
     # b = a.print_unallocated()
     # print(b)
-
-
 
 
 print(opt)
