@@ -160,4 +160,22 @@ class Amity:
         return 'Data successfully exported to the Database'
 
     def load_state(self):
-        pass
+        try:
+            conn = sqlite3.coonect('amity.db')
+            curs = conn.cursor()
+
+            curs.execute(
+                "SELECT * FROM data WHERE aID = (SELECT MAX(aID) FROM data)")
+            data = conn.fetchone()
+
+            Amity.rooms = pickle.loads(data[1])
+            Room.occupants = pickle.loads(data[2])
+            Amity.office_waiting_list = pickle.loads(data[3])
+            Amity.living_space_waiting_list = pickle.loads(data[4])
+
+            curs.close()
+            return 'Successfully loaded data from the Database!'
+
+        except Error:
+            remove('amity.db')
+            return "Database not found, Please check the name and try again!"
