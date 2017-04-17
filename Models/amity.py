@@ -13,9 +13,9 @@ class Amity:
     def create_room(self, room_type, room_name):
         room_type = room_type.upper()
         # check for already existing room
-        check_room = [room.room_name for room in self.rooms['office'] if room.room_name == room_name] + \
-            [room.room_name for room in self.rooms['living_space']
-                if room.room_name == room_name]
+        all_rooms = self.rooms['office'] + self.rooms['living_space']
+        check_room = [
+            room.room_name for room in all_rooms if room.room_name == room_name]
         if check_room:
             print('{} already exists'.format(room_name))
         else:
