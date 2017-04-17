@@ -69,7 +69,6 @@ class Amity:
                 self.office_waiting_list.append(fellow)
                 print('You have been added to office waiting list')
             if accommodation == 'YES':
-
                     # check if there are available livigspaces and offices
                 living_space_selected_random = self.allocate_room("livingspace")
                 if living_space_selected_random:
@@ -86,17 +85,16 @@ class Amity:
                 staff.role, staff.first_name, staff.last_name))
             if accommodation == 'YES':
                 print("Staff cannot get accommodation")
-                return
             else:
-                allocated_room = self.allocate_room("office")
-                if allocated_room is None or len(allocated_room.occupants) >= allocated_room.capacity:
-                    self.office_waiting_list.append(staff)
-                    print(
-                        'There are currently no offices. You have been added to the office waiting list')
+                office_selected_random = self.allocate_room("office")
+                if office_selected_random:
+                    if len(office_selected_random.occupants) < office_selected_random.office_capacity:
+                        office_selected_random.occupants.append(staff)
+                        print('You have been allocated to office' +
+                              office_selected_random.room_name)
                 else:
-                    self.rooms['office'][allocated_room.name].occupants += [staff]
-                    print('You have been allocated to office ' +
-                          allocated_room.name)
+                    self.office_waiting_list.append(staff)
+                    print('You have been added to office waiting list')
 
     def reallocate_person(self, person_id, new_room_name):
         pass
