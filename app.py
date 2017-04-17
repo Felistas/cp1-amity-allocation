@@ -13,6 +13,7 @@ Usage:
     Amity print_room <room_name>
     Amity save_state [--db=sqlite_database]
     Amity load_state [--db=sqlite_database]
+    Amity print_all_rooms
     Amity (-i | --interactive)
     Amity (-h | --help | --version)
 Options:
@@ -91,12 +92,17 @@ class Amityapp(cmd.Cmd):
         """Usage: print_unallocated [--o=filename]"""
         print(self.amity.print_unallocated(arg['--o']))
 
-        @docopt_cmd
+    @docopt_cmd
+    def do_print_all_rooms(self, arg):
+        """Usage: print_all_rooms"""
+        self.amity.print_all_rooms()
+
+    @docopt_cmd
     def do_save_state(self, args):
         """Usage: save_state [--db=sqlite_database]"""
         self.amity.save_state(args['--db'])
 
-        @docopt_cmd
+    @docopt_cmd
     def do_load_state(self, args):
         """Usage: load_state [--db=sqlite_database]"""
         self.amity.load_state(args['--db'])

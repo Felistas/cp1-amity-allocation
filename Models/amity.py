@@ -1,10 +1,8 @@
 import random
 import sqlite3
 from tabulate import tabulate
-
-
 from Models.person import Fellow, Staff
-from Models.room import Office, LivingSpace, Room
+from Models.room import Office, LivingSpace
 
 
 class Amity:
@@ -12,77 +10,83 @@ class Amity:
     office_waiting_list = []
     living_space_waiting_list = []
 
-    def create_room(self, room_type, room_names):
+    def create_room(self, room_type, room_name):
         room_type = room_type.upper()
-        rooms = list(self.rooms['living_space'].keys())
-        rooms += list(self.rooms['office'].keys())
-        for room_name in room_names:
-            check_room = room_name in rooms
-            if check_room:
-                print('{} already exists'.format(room_name))
-            else:
-                if room_type == 'OFFICE':
-                    room = Office(room_name)
-                    self.rooms['office'].update({room_name: room})
-                    print('{} successfully created'.format(room_name))
-                elif room_type == 'LIVINGSPACE':
-                    room = LivingSpace(room_name)
-                    self.rooms['living_space'].update({room_name: room})
-                    print('{} successfully created'.format(room_name))
+        # get a list of all keys(room_objects) in the rooms dictionary
+        rooms = list(self.rooms['living_space'].keys()) + \
+            list(self.rooms['office'].keys())
+        # check for already existing room
+        check_room = [
+            room.room_name for room in rooms if room.room_name == room_name]
+        if check_room:
+            print('{} already exists'.format(room_name))
+        else:
+            # create office and livingspace
+            if room_type == 'OFFICE':
+                room = Office(room_name)
+                self.rooms['office'].append({room: []})
+                print('{} successfully created'.format(room_name))
+            elif room_type == 'LIVINGSPACE':
+                room = LivingSpace(room_name)
+                self.rooms['living_space'].append({room: []})
+                print('{} successfully created'.format(room_name))
+    # pick a room at random to allocate a person
 
     def allocate_room(self, room_type):
         room_type = room_type.upper()
         if room_type == "OFFICE":
-            offices = list(self.rooms['office'])
-            if len(offices) > 0:
+            offices = list(self.rooms['office'].keys())
+            living_spaces = list(self.rooms['living_space'].keys())
+            if len(offices):
                 # select a random office
                 return self.rooms['office'][random.choice(offices)]
-            else:
-                return None
         else:
-            living_spaces = list(self.rooms['living_space'])
-            if len(living_spaces) > 0:
+            if len(living_spaces):
                 # select a random living  space
                 return self.rooms['living_space'][random.choice(living_spaces)]
-            else:
-                return None
 
-    def add_person(self, role, first_name, last_name, accommodation="no"):
+    def add_person(self, role, first_name, last_name, accommodation="NO"):
         role = role.upper()
         first_name = first_name.upper()
         last_name = last_name.upper()
         accommodation = accommodation.upper()
         if role == 'FELLOW':
+            # create fellow object
             fellow = Fellow(role, first_name, last_name, accommodation)
             print('{} {} {} successfully added'.format(
                 fellow.role, fellow.first_name, fellow.last_name))
             if accommodation == 'YES':
-                # allocate  an office selected at room
-                allocated_room = self.allocate_room("livingspace")
-
-                if allocated_room is None or len(allocated_room.occupants) >= allocated_room.capacity:
-                    # allocate to waiting list
+                # check if there are available livigspaces and offices
+                living_space_selected_random = self.allocate_room("livingspace")
+                office_selected_random = self.allocate_room("office")
+                # if there is no room available or the room is full
+                # room for room in list(room['office'].keys()) if
+                # len(self.rooms["office"][room]) < 6
+                if len(living_space_selected_random.allocated_livingspace) == 6:
                     self.living_space_waiting_list.append(fellow)
-                    print(
-                        'There are no living spaces available. You have been added to the living space waiting list')
-
+                if len(office_selected_random.allocated_office) == 4:
+                    self.office_waiting_list.append(fellow)
+                # print('You have been added to a waiting list')
                 else:
                     # append person to office object
-                    self.rooms['living_space'][allocated_room.name].occupants += [fellow]
+                    self.rooms['living_space'][living_space_allocated_room.name].occupants += [fellow]
                     print('You have been allocated to living space ' +
+                          living_space_allocated_room.name)
+                    self.rooms['office'][office_allocated_room.name].occupants += [fellow]
+                    print('You have been allocated to office ' +
+                          office_allocated_room.name)
+            elif accommodation == 'NO':
+                allocated_room = self.allocate_room("office")
+                if allocated_room is None or len(allocated_room.occupants) == allocated_room.capacity:
+                    # allocate to waiting list
+                    self.office_waiting_list.append(fellow)
+                    print(
+                        'There are no offices available. You have been added to the office waiting list')
+                else:
+                    # append person to office object
+                    self.rooms['office'][allocated_room.name].occupants += [fellow]
+                    print('You have been allocated to office ' +
                           allocated_room.name)
-
-            allocated_room = self.allocate_room("office")
-
-            if allocated_room is None or len(allocated_room.occupants) >= allocated_room.capacity:
-                # allocate to waiting list
-                self.office_waiting_list.append(fellow)
-                print(
-                    'There are no offices available. You have been added to the office waiting list')
-            else:
-                # append person to office object
-                self.rooms['office'][allocated_room.name].occupants += [fellow]
-                print('You have been allocated to office ' + allocated_room.name)
         elif role == 'STAFF':
             staff = Staff(role, first_name, last_name,  accommodation)
             print('{} {} {} successfully added'.format(
@@ -108,12 +112,37 @@ class Amity:
         pass
 
     def print_allocations(self, filename=None):
-        print('List of fellows with living space')
-        # for room in list(Amity.rooms['living_space'].keys()):
-        #     print(room)
-        for person in Room.occupants:
+        offices = list(self.rooms["office"].keys())
+        if len(offices) > 0:
+            for office in offices:
+                if len(self.rooms["office"][office]) > 0:
+                    print("{}".format(office.room_name))
+                    print("---------------------------")
+                    people_allocated_that_living_space = []
+                    for person in self.rooms["office"][office]:
+                        name = person.first_name + " " + person.last_name
+                        people_allocated_that_living_space.append(name)
+                        print(', '.join(people_allocated_that_living_space))
+                else:
+                    print("There are no occupants in the room")
+        else:
+            print("No office spaces currenty added")
+        living_spaces = list(self.rooms['living_space'].keys())
+        if len(living_spaces) > 0:
+            for livingspace in living_spaces:
+                if len(self.rooms['living_space'][livingspace]) > 0:
+                    print("{}".format(livingspace.name))
+                    print("---------------------------")
+                    people_allocated_that_office = []
+                    for person in self.rooms['living_space'][livingspace]:
+                        name = person.first_name + " " + person.last_name
+                        people_allocated_that_office.append(name)
+                        print(''.join(people_allocated_that_office))
+                else:
+                    print("There are no occupants in the room")
 
-            print(Room.occupants)
+        else:
+            print("There are no living spaces added currently")
 
     def print_unallocated(self, filename=None):
         # print people not allocated to office
@@ -121,22 +150,34 @@ class Amity:
             print("Everyone within the system has an office or livingspace")
         else:
             print("People not allocated to office \n")
+            print("---------------------------")
             unallocated_office_space = ['\n'.join(str(
                 person.person_id) + ' ' + person.first_name + ' ' + person.last_name for person in Amity.office_waiting_list)]
-            print(tabulate(unallocated_office_space))
+            print(unallocated_office_space)
             # print people not allocated to living space
             print("People not allocated to living space \n")
+            print("---------------------------")
             unallocated_living_space = ['\n'.join(str(
                 person.person_id) + ' ' + person.first_name + ' ' + person.last_name for person in Amity.living_space_waiting_list)]
-            print(tabulate(unallocated_living_space))
+            print(unallocated_living_space)
 
-    def print_all_livingspaces(self):
-        for room in list(Amity.rooms['living_space'].keys()):
-            print(room)
-
-    def print_all_offices(self):
-        for room in list(Amity.rooms['office'].keys()):
-            print(room)
+    def print_all_rooms(self):
+        offices = list(Amity.rooms['living_space'].keys())
+        if len(offices) > 0:
+            for office in offices:
+                print("OFFICES")
+                print("---------------------------")
+                print(office.room_name)
+        else:
+            print("There are no offices")
+        living_spaces = list(self.rooms['living_space'].keys())
+        if len(living_spaces) > 0:
+            for living_space in living_spaces:
+                print("LIVING SPACES")
+                print("---------------------------")
+                print(living_space.room_name)
+        else:
+            print("There are no livingspaces")
 
     def save_state(self):
         # create database
