@@ -7,6 +7,7 @@ from Models.room import Office, LivingSpace
 
 class Amity:
     rooms = {'living_space': [], 'office': []}
+    people = []
     office_waiting_list = []
     living_space_waiting_list = []
 
@@ -56,6 +57,7 @@ class Amity:
         if role == 'FELLOW':
             # create fellow object
             fellow = Fellow(role, first_name, last_name, accommodation)
+            self.people.append(fellow)
             print('{} {} {} successfully added'.format(
                 fellow.role, fellow.first_name, fellow.last_name))
             # allocate office
@@ -81,6 +83,7 @@ class Amity:
                     print('You have been added to livingspace waiting list')
         elif role == 'STAFF':
             staff = Staff(role, first_name, last_name,  accommodation)
+            self.people.append(staff)
             print('{} {} {} successfully added'.format(
                 staff.role, staff.first_name, staff.last_name))
             if accommodation == 'YES':
@@ -96,11 +99,70 @@ class Amity:
                     self.office_waiting_list.append(staff)
                     print('You have been added to office waiting list')
 
-    def reallocate_person(self, person_id, new_room_name):
-        pass
+    def print_person_id(self, first_name, last_name):
+        """ Print the person id given the person name"""
+        person_id = [person.id for person in self.people if first_name ==
+                     person.first_name and last_name == person.last_name]
+        if person_id:
+            print(person_id[0], first_name, last_name)
+        else:
+            print("Person does not exist")
+
+    def reallocate_person(self, person_id, room_name):
+        ''' check if the room the user chooses exists
+        if not return room does not exist
+        check if the room the user chooses is empty
+        if full assert no space available
+        check if the person exists
+        if person does not exist assert non existance of the person
+        reallocate person
+        check if the room exists and if its empty
+        ensure that the person cannot be reallocated to the same room
+        cannot reallocate a staff to a living space
+        allocate people in office waiting list
+        allocate people in living space waiting list
+
+        '''
+    # check if the room exists
+        for room_name in room_name:
+            room.room_type = room.type.upper()
+            all_rooms = self.rooms['office'] + self.rooms['living_space']
+            room = [room.room_name for room in all_rooms if room.room_name == room_name]
+            if room:
+                if room.room_type == 'OFFICE':
+                    if len(room.occupants) < room.office_capacity:
+                        # append the person to this room
+                        pass
+                    else:
+                        print("{} is full".format(room.room_name))
+                elif room.room_type == 'LIVINGSPACE':
+                    if len(room.occupants) < room.living_space_capacity:
+                        # reallocate person to this room
+                        pass
+                    else:
+                        print("{} is full".format(room.room_name))
+
+            else:
+                return 'Room does not exist'
 
     def load_people(self):
         pass
+
+    def print_available_rooms(self):
+        offices = self.rooms['office']
+        if len(office.occupants) < office.office_capacity:
+            for office in offices:
+                empty_offices = []
+                empty_offices.append(office)
+        else:
+            print("No empty offices available")
+        living_spaces = self.rooms['living_space']
+        if len(living_space.occupants) < living_space.living_space_capacity:
+            for living_space in living_spaces:
+                empty_living_spaces = []
+                empty_living_spaces.append(living_space)
+        else:
+            print("No empty living spaces available")
 
     def print_allocations(self, filename=None):
         offices = list(self.rooms["office"].keys())
@@ -207,7 +269,6 @@ class Amity:
 
             curs.close()
             return 'Successfully loaded data from the Database!'
-
         except Error:
             remove('amity.db')
             return "Database not found, Please check the name and try again!"

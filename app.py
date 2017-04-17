@@ -10,6 +10,7 @@ Usage:
     Amity load_people
     Amity print_allocations [-o=filename]
     Amity print_unallocated [-o=filename]
+    Amity print_person_id <first_name> <last_name>
     Amity print_room <room_name>
     Amity save_state [--db=sqlite_database]
     Amity load_state [--db=sqlite_database]
@@ -93,6 +94,11 @@ class Amityapp(cmd.Cmd):
         print(self.amity.print_unallocated(arg['--o']))
 
     @docopt_cmd
+    def do_print_person_id(self, arg):
+        """ Usage: print_person_id <first_name> <last_name> """
+        self.amity.print_person_id(arg['<first_name>'], arg['<last_name>'])
+
+    @docopt_cmd
     def do_print_all_rooms(self, arg):
         """Usage: print_all_rooms"""
         self.amity.print_all_rooms()
@@ -105,7 +111,7 @@ class Amityapp(cmd.Cmd):
     @docopt_cmd
     def do_load_state(self, args):
         """Usage: load_state [--db=sqlite_database]"""
-        self.amity.load_state(args['--db'])
+        self.amity.load_state()
 
     def do_quit(self, arg):
         """Quits out of Interactive Mode."""
