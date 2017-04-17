@@ -6,29 +6,27 @@ from Models.room import Office, LivingSpace
 
 
 class Amity:
-    rooms = {'living_space': {}, 'office': {}}
+    rooms = {'living_space': [], 'office': []}
     office_waiting_list = []
     living_space_waiting_list = []
 
     def create_room(self, room_type, room_name):
         room_type = room_type.upper()
-        # get a list of all keys(room_objects) in the rooms dictionary
-        rooms = list(self.rooms['living_space'].keys()) + \
-            list(self.rooms['office'].keys())
         # check for already existing room
-        check_room = [
-            room.room_name for room in rooms if room.room_name == room_name]
+        check_room = [room.room_name for room in self.rooms['office'] if room.room_name == room_name] + \
+            [room.room_name for room in self.rooms['living_space']
+                if room.room_name == room_name]
         if check_room:
             print('{} already exists'.format(room_name))
         else:
             # create office and livingspace
             if room_type == 'OFFICE':
                 room = Office(room_name)
-                self.rooms['office'].append({room: []})
+                self.rooms['office'].append(room)
                 print('{} successfully created'.format(room_name))
             elif room_type == 'LIVINGSPACE':
                 room = LivingSpace(room_name)
-                self.rooms['living_space'].append({room: []})
+                self.rooms['living_space'].append(room)
                 print('{} successfully created'.format(room_name))
     # pick a room at random to allocate a person
 
