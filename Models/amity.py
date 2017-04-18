@@ -137,9 +137,9 @@ class Amity:
 
         previous_rooms = []
         for room in all_rooms:
-            for occupant in room.occupants:
-                if occupant == person:
-                    previous_rooms.append(room)
+            if person in room.occupants:
+                print(room.room_name, room.occupants)
+                previous_rooms.append(room)
         if len(previous_rooms) == 0:
             return 'Person had been allocated a room'
         if new_room is not None:
@@ -149,16 +149,14 @@ class Amity:
                 return 'Cannot reallocate staff to livingspace'
             if not type(new_room) in [type(room) for room in previous_rooms]:
                 return 'Cannot reallocate from one room type to a different one'
+            print(previous_rooms, new_room)
             if len(new_room.occupants) == new_room.capacity:
                 return 'Room is full'
-            if not new_room.room_name in [room.room_name for room in previous_rooms]:
+            if new_room in previous_rooms:
                 return 'Cannot reallocate to the same room'
             for room in previous_rooms:
-                if type(room) == type(new_room):
-                    try:
-                        room.occupants.remove(person)
-                    except:
-                        pass
+                if person in room.occupants:
+                    room.occupants.remove(person)
             new_room.occupants.append(person)
             return 'Successfully reallocated to {}'.format(new_room.room_name)
         return 'Room does not exist'
