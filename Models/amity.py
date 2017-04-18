@@ -135,6 +135,7 @@ class Amity:
                 if room.room_type == 'OFFICE':
                     if len(room.occupants) < room.office_capacity:
                         pass
+
                     else:
                         print("{} is full".format(room.room_name))
                 elif room.room_type == 'LIVINGSPACE':
@@ -175,53 +176,29 @@ class Amity:
         pass
 
     def print_available_rooms(self):
-        offices = self.rooms['office']
         if len(office.occupants) < office.office_capacity:
+            offices = self.rooms['office']
             for office in offices:
-                empty_offices = []
-                empty_offices.append(office)
+                print(office.room_name)
         else:
             print("No empty offices available")
-        living_spaces = self.rooms['living_space']
         if len(living_space.occupants) < living_space.living_space_capacity:
+            living_spaces = self.rooms['living_space']
             for living_space in living_spaces:
-                empty_living_spaces = []
-                empty_living_spaces.append(living_space)
+                print(living_space.room_name)
         else:
             print("No empty living spaces available")
 
     def print_allocations(self, filename=None):
-        offices = list(self.rooms["office"].keys())
+        offices = list(self.rooms["office"])
         if len(offices) > 0:
             for office in offices:
-                if len(self.rooms["office"][office]) > 0:
-                    print("{}".format(office.room_name))
-                    print("---------------------------")
-                    people_allocated_that_living_space = []
-                    for person in self.rooms["office"][office]:
-                        name = person.first_name + " " + person.last_name
-                        people_allocated_that_living_space.append(name)
-                        print(', '.join(people_allocated_that_living_space))
+                if len([room][occupants]) > 0:
+                    print(person.first_name)
                 else:
-                    print("There are no occupants in the room")
+                    print("There are no occupants in {}".format(room.room_name))
         else:
-            print("No office spaces currenty added")
-        living_spaces = list(self.rooms['living_space'].keys())
-        if len(living_spaces) > 0:
-            for livingspace in living_spaces:
-                if len(self.rooms['living_space'][livingspace]) > 0:
-                    print("{}".format(livingspace.name))
-                    print("---------------------------")
-                    people_allocated_that_office = []
-                    for person in self.rooms['living_space'][livingspace]:
-                        name = person.first_name + " " + person.last_name
-                        people_allocated_that_office.append(name)
-                        print(''.join(people_allocated_that_office))
-                else:
-                    print("There are no occupants in the room")
-
-        else:
-            print("There are no living spaces added currently")
+            print("No offices available")
 
     def print_unallocated(self, filename=None):
         # print people not allocated to office
@@ -241,7 +218,7 @@ class Amity:
             print(unallocated_living_space)
 
     def print_all_rooms(self):
-        offices = list(Amity.rooms['living_space'].keys())
+        offices = list(Amity.rooms['office'])
         if len(offices) > 0:
             for office in offices:
                 print("OFFICES")
@@ -249,7 +226,7 @@ class Amity:
                 print(office.room_name)
         else:
             print("There are no offices")
-        living_spaces = list(self.rooms['living_space'].keys())
+        living_spaces = list(self.rooms['living_space'])
         if len(living_spaces) > 0:
             for living_space in living_spaces:
                 print("LIVING SPACES")

@@ -10,6 +10,8 @@ Usage:
     Amity load_people
     Amity print_allocations [-o=filename]
     Amity print_unallocated [-o=filename]
+    Amity print_available_rooms
+    Amity print_all_rooms
     Amity print_person_id <first_name> <last_name>
     Amity print_room <room_name>
     Amity save_state [--db=sqlite_database]
@@ -107,6 +109,11 @@ class Amityapp(cmd.Cmd):
     def do_print_all_rooms(self, arg):
         """Usage: print_all_rooms"""
         self.amity.print_all_rooms()
+
+    @docopt_cmd
+    def do_print_available_rooms(self, arg):
+        """Usage: print_available_rooms"""
+        self.amity.print_available_rooms()
 
     @docopt_cmd
     def do_save_state(self, args):
