@@ -101,12 +101,15 @@ class Amity:
 
     def print_person_id(self, first_name, last_name):
         """ Print the person id given the person name"""
-        person_id = [person.id for person in self.people if first_name ==
-                     person.first_name and last_name == person.last_name]
-        if person_id:
-            print(person_id[0], first_name, last_name)
-        else:
-            print("Person does not exist")
+        first_name = first_name.upper()
+        last_name = last_name.upper()
+        ids = [person.person_id for person in self.people if first_name ==
+               person.first_name and last_name == person.last_name]
+        for person_id in ids:
+            if person_id:
+                print(person_id, first_name, last_name)
+            else:
+                print("Person does not exist")
 
     def reallocate_person(self, person_id, room_name):
         ''' check if the room the user chooses exists
@@ -123,22 +126,27 @@ class Amity:
         allocate people in living space waiting list
 
         '''
-    # check if the room exists
+        # check if the room exists
+        room_type = room.type_upper()
         for room_name in room_name:
-            room.room_type = room.type.upper()
             all_rooms = self.rooms['office'] + self.rooms['living_space']
             room = [room.room_name for room in all_rooms if room.room_name == room_name]
             if room:
                 if room.room_type == 'OFFICE':
                     if len(room.occupants) < room.office_capacity:
-                        # append the person to this room
                         pass
                     else:
                         print("{} is full".format(room.room_name))
                 elif room.room_type == 'LIVINGSPACE':
                     if len(room.occupants) < room.living_space_capacity:
-                        # reallocate person to this room
-                        pass
+                        # check if the person id given is correct
+                        ids = [person.person_id for person in self.people if first_name ==
+                               person.first_name and last_name == person.last_name]
+                        for person_id in ids:
+                            if person_id:
+                                pass
+                            else:
+                                print("Invalid person ID")
                     else:
                         print("{} is full".format(room.room_name))
 

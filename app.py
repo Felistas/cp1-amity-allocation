@@ -6,7 +6,7 @@ interactive command application.
 Usage:
     Amity create_room (office|livingspace) <room_name>
     Amity add_person (fellow|staff) <first_name> <last_name> [<accommodation>]
-    Amity reallocate_person <person_identifier> <new_room_name>
+    Amity reallocate_person <person_id> <room_name>
     Amity load_people
     Amity print_allocations [-o=filename]
     Amity print_unallocated [-o=filename]
@@ -82,6 +82,11 @@ class Amityapp(cmd.Cmd):
             role = "staff"
         self.amity.add_person(
             role, arg['<first_name>'], arg['<last_name>'], arg['<accommodation>'])
+
+    @docopt_cmd
+    def do_reallocate_person(self, arg):
+        """Usage: reallocate_person <person_id> <room_name>"""
+        self.amity.reallocate_person(arg['<person_id>'], arg['<room_name>'])
 
     @docopt_cmd
     def do_print_allocations(self, arg):
