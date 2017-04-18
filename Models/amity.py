@@ -53,7 +53,8 @@ class Amity:
         role = role.upper()
         first_name = first_name.upper()
         last_name = last_name.upper()
-        accommodation = accommodation.upper()
+        accommodation = (accommodation.upper()
+                         if accommodation is not None else "NO")
         if role == 'FELLOW':
             # create fellow object
             fellow = Fellow(role, first_name, last_name, accommodation)
@@ -63,18 +64,18 @@ class Amity:
             # allocate office
             office_selected_random = self.allocate_room("office")
             if office_selected_random:
-                if len(office_selected_random.occupants) < office_selected_random.office_capacity:
+                if len(office_selected_random.occupants) < office_selected_random.capacity:
                     office_selected_random.occupants.append(fellow)
                     print('You have been allocated to office' +
                           office_selected_random.room_name)
-            else:
-                self.office_waiting_list.append(fellow)
-                print('You have been added to office waiting list')
+                else:
+                    self.office_waiting_list.append(fellow)
+                    print('You have been added to office waiting list')
             if accommodation == 'YES':
                     # check if there are available livigspaces and offices
                 living_space_selected_random = self.allocate_room("livingspace")
                 if living_space_selected_random:
-                    if len(living_space_selected_random.occupants) < living_space_selected_random.living_space_capacity:
+                    if len(living_space_selected_random.occupants) < living_space_selected_random.capacity:
                         living_space_selected_random.occupants.append(fellow)
                         print('You have been allocated to living space' +
                               living_space_selected_random.room_name)
@@ -91,7 +92,7 @@ class Amity:
             else:
                 office_selected_random = self.allocate_room("office")
                 if office_selected_random:
-                    if len(office_selected_random.occupants) < office_selected_random.office_capacity:
+                    if len(office_selected_random.occupants) < office_selected_random.capacity:
                         office_selected_random.occupants.append(staff)
                         print('You have been allocated to office' +
                               office_selected_random.room_name)
@@ -117,72 +118,62 @@ class Amity:
         check the room type of the room provided
         check if the person ID provided exist
         check the role of the person and assert staff cannot get accommodation
-        if fellow check if he/she is the livingspace waiting list then reallocate_person
         if in another room check the room type of the previous room
         remove the fellow from the previous room
         append person to the new room
         check person should not be reallocated to the same room
         '''
         # check if the room exists
+        person = [person for person in self.people if int(person_id) ==
+                  person.person_id]
+        if len(person) == 0:
+            return 'Person does not exist'
+        person = person[0]
+        all_rooms = self.rooms['office'] + self.rooms['living_space']
+        new_room = None
+        for room in all_rooms:
+            if room.room_name == room_name:
+                new_room = room
 
-        for room_name in room_name:
-            all_rooms = self.rooms['office'] + self.rooms['living_space']
-            room = [room.room_name for room in all_rooms if room_name ==
-                    room.room_name]
-            new_room_type = room.room_type
-            if room:
-                room_type = room_type.upper()
-                if room.room_type == 'OFFICE':
-                    if len(room.occupants) < room.office_capacity:
+        previous_rooms = []
+        for room in all_rooms:
+            for occupant in room.occupants:
+                if occupant == person:
+                    previous_rooms.append(room)
+        if len(previous_rooms) == 0:
+            return 'Person had been allocated a room'
+        if new_room is not None:
+            room_type = type(new_room)
+            role = person.role.upper()
+            if role == 'STAFF' and room_type == LivingSpace:
+                return 'Cannot reallocate staff to livingspace'
+            if not type(new_room) in [type(room) for room in previous_rooms]:
+                return 'Cannot reallocate from one room type to a different one'
+            if len(new_room.occupants) == new_room.capacity:
+                return 'Room is full'
+            if not new_room.room_name in [room.room_name for room in previous_rooms]:
+                return 'Cannot reallocate to the same room'
+            for room in previous_rooms:
+                if type(room) == type(new_room):
+                    try:
+                        room.occupants.remove(person)
+                    except:
                         pass
-
-                    else:
-                        print("{} is full".format(room.room_name))
-                elif room.room_type == 'LIVINGSPACE':
-                    if len(room.occupants) < room.living_space_capacity:
-                        # check if the person id given is correct
-                        ids = [
-                            person.person_id for person in self.people if person_id == person.person_id]
-                        for person_id in ids:
-                            role = role.upper()
-                            if person_id:
-                                # check the role of the person
-                                if person.role == "STAFF":
-                                    print(
-                                        "Staff cannot be reallocated to a livingpsace")
-                                else:
-                                    for person in self.living_space_waiting_list:
-                                        if person.person_id == person_id:
-                                            room.occupants.append(person)
-                                        elif person in room.occupants:
-                                            person_room_type = room.room_type
-                                            if person_room_type != new_room_type:
-                                                print(
-                                                    "Person cannot be reallocated to different room type")
-                                            else:
-                                                room.occupants.remove(person)
-                                                new_room = room.room_name
-                                                new_room.occupants.append(
-                                                    fellow)
-                            else:
-                                print("Person does not exist")
-                    else:
-                        print("{} is full".format(room.room_name))
-
-            else:
-                return 'Room does not exist'
+            new_room.occupants.append(person)
+            return 'Successfully reallocated to {}'.format(new_room.room_name)
+        return 'Room does not exist'
 
     def load_people(self):
         pass
 
     def print_available_rooms(self):
-        if len(office.occupants) < office.office_capacity:
+        if len(office.occupants) < office.capacity:
             offices = self.rooms['office']
             for office in offices:
                 print(office.room_name)
         else:
             print("No empty offices available")
-        if len(living_space.occupants) < living_space.living_space_capacity:
+        if len(living_space.occupants) < living_space.capacity:
             living_spaces = self.rooms['living_space']
             for living_space in living_spaces:
                 print(living_space.room_name)
@@ -190,15 +181,19 @@ class Amity:
             print("No empty living spaces available")
 
     def print_allocations(self, filename=None):
-        offices = list(self.rooms["office"])
-        if len(offices) > 0:
-            for office in offices:
-                if len([room][occupants]) > 0:
-                    print(person.first_name)
-                else:
-                    print("There are no occupants in {}".format(room.room_name))
+        all_rooms = self.rooms["office"] + self.rooms["living_space"]
+        msg = ''
+        if len(all_rooms) > 0:
+            for room in all_rooms:
+                if len(room.occupants) > 0:
+                    msg += room.room_name
+                    msg += "\n---------------------------\n"
+                    for person in room.occupants:
+                        msg += (person.first_name + " " +
+                                person.last_name + ",")
+            return msg
         else:
-            print("No offices available")
+            return "No offices available"
 
     def print_unallocated(self, filename=None):
         # print people not allocated to office
