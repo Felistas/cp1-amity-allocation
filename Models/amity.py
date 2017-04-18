@@ -113,25 +113,25 @@ class Amity:
 
     def reallocate_person(self, person_id, room_name):
         ''' check if the room the user chooses exists
-        if not return room does not exist
-        check if the room the user chooses is empty
-        if full assert no space available
-        check if the person exists
-        if person does not exist assert non existance of the person
-        reallocate person
-        check if the room exists and if its empty
-        ensure that the person cannot be reallocated to the same room
-        cannot reallocate a staff to a living space
-        allocate people in office waiting list
-        allocate people in living space waiting list
-
+        check if there is capacity in the room provided
+        check the room type of the room provided
+        check if the person ID provided exist
+        check the role of the person and assert staff cannot get accommodation
+        if fellow check if he/she is the livingspace waiting list then reallocate_person
+        if in another room check the room type of the previous room
+        remove the fellow from the previous room
+        append person to the new room
+        check person should not be reallocated to the same room
         '''
         # check if the room exists
-        room_type = room.type_upper()
+
         for room_name in room_name:
             all_rooms = self.rooms['office'] + self.rooms['living_space']
-            room = [room.room_name for room in all_rooms if room.room_name == room_name]
+            room = [room.room_name for room in all_rooms if room_name ==
+                    room.room_name]
+            new_room_type = room.room_type
             if room:
+                room_type = room_type.upper()
                 if room.room_type == 'OFFICE':
                     if len(room.occupants) < room.office_capacity:
                         pass
@@ -140,13 +140,31 @@ class Amity:
                 elif room.room_type == 'LIVINGSPACE':
                     if len(room.occupants) < room.living_space_capacity:
                         # check if the person id given is correct
-                        ids = [person.person_id for person in self.people if first_name ==
-                               person.first_name and last_name == person.last_name]
+                        ids = [
+                            person.person_id for person in self.people if person_id == person.person_id]
                         for person_id in ids:
+                            role = role.upper()
                             if person_id:
-                                pass
+                                # check the role of the person
+                                if person.role == "STAFF":
+                                    print(
+                                        "Staff cannot be reallocated to a livingpsace")
+                                else:
+                                    for person in self.living_space_waiting_list:
+                                        if person.person_id == person_id:
+                                            room.occupants.append(person)
+                                        elif person in room.occupants:
+                                            person_room_type = room.room_type
+                                            if person_room_type != new_room_type:
+                                                print(
+                                                    "Person cannot be reallocated to different room type")
+                                            else:
+                                                room.occupants.remove(person)
+                                                new_room = room.room_name
+                                                new_room.occupants.append(
+                                                    fellow)
                             else:
-                                print("Invalid person ID")
+                                print("Person does not exist")
                     else:
                         print("{} is full".format(room.room_name))
 
