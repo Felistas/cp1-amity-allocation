@@ -218,24 +218,29 @@ class Amity:
         if filename:
             file = open(filename, 'w')
             file.write(msg)
-            file.close(msg)
+            file.close()
 
     def print_unallocated(self, filename=None):
         # print people not allocated to office
         if len(Amity.office_waiting_list) == 0 and len(Amity.living_space_waiting_list) == 0:
-            print("Everyone within the system has an office or livingspace")
+            return "Everyone within the system has an office or livingspace"
         else:
             print("People not allocated to office \n")
             print("---------------------------")
-            unallocated_office_space = ['\n'.join(str(
-                person.person_id) + ' ' + person.first_name + ' ' + person.last_name for person in Amity.office_waiting_list)]
-            print(unallocated_office_space)
+            unallocated_office_space = '\n'.join(str(
+                person.person_id) + ' ' + person.first_name + ' ' + person.last_name for person in Amity.office_waiting_list)
+            return unallocated_office_space
             # print people not allocated to living space
             print("People not allocated to living space \n")
             print("---------------------------")
-            unallocated_living_space = ['\n'.join(str(
-                person.person_id) + ' ' + person.first_name + ' ' + person.last_name for person in Amity.living_space_waiting_list)]
-            print(unallocated_living_space)
+            unallocated_living_space = '\n'.join(str(
+                person.person_id) + ' ' + person.first_name + ' ' + person.last_name for person in Amity.living_space_waiting_list)
+            return unallocated_living_space
+        if filename:
+            file = open(filename, 'w')
+            file.write(unallocated_office_space)
+            file.write(unallocated_living_space)
+            file.close()
 
     def print_all_rooms(self):
         offices = list(Amity.rooms['office'])
