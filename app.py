@@ -12,6 +12,7 @@ Usage:
     Amity print_unallocated [-o=filename]
     Amity print_available_rooms
     Amity print_all_rooms
+    Amity allocate_office_waiting_list
     Amity print_person_id <first_name> <last_name>
     Amity print_room <room_name>
     Amity save_state [--db=sqlite_database]
@@ -94,6 +95,7 @@ class Amityapp(cmd.Cmd):
     @docopt_cmd
     def do_print_allocations(self, arg):
         """Usage: print_allocations [--o=filename]"""
+        filename = arg['--o']
         print(self.amity.print_allocations(arg['--o']))
 
     @docopt_cmd
@@ -105,6 +107,16 @@ class Amityapp(cmd.Cmd):
     def do_print_person_id(self, arg):
         """ Usage: print_person_id <first_name> <last_name> """
         self.amity.print_person_id(arg['<first_name>'], arg['<last_name>'])
+
+    @docopt_cmd
+    def do_allocate_office_waiting_list(self, arg):
+        """Usage: allocate_office_waiting_list"""
+        self.amity.allocate_office_waiting_list()
+
+    @docopt_cmd
+    def do_allocate_livingspace_waiting_list(self, arg):
+        """Usage: allocate_office_waiting_list"""
+        self.amity.allocate_livingspace_waiting_list()
 
     @docopt_cmd
     def do_print_all_rooms(self, arg):

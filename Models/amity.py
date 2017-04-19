@@ -65,9 +65,9 @@ class Amity:
                     office_selected_random.occupants.append(fellow)
                     print('You have been allocated to office' +
                           office_selected_random.room_name)
-                else:
-                    self.office_waiting_list.append(fellow)
-                    print('You have been added to office waiting list')
+            else:
+                self.office_waiting_list.append(fellow)
+                print('You have been added to office waiting list')
             if accommodation == 'YES':
                     # check if there are available livigspaces and offices
                 living_space_selected_random = self.allocate_room("livingspace")
@@ -154,6 +154,36 @@ class Amity:
             return 'Successfully reallocated to {}'.format(new_room.room_name)
         return 'Room does not exist'
 
+    def allocate_office_waiting_list(self):
+        offices = self.rooms['office']
+        if len(offices) > 0:
+            if len(self.office_waiting_list) > 0:
+                for person in self.office_waiting_list:
+                    random_office = self.allocate_room("office")
+                    if len(random_office.occupants) < random_office.capacity:
+                        random_office.occupants.append(person)
+                        print("You have be allocted to room {}".format(
+                            person.first_name))
+            else:
+                print("There are no people in the waiting list")
+        else:
+            print("No office available")
+
+    def allocate_livingspace_waiting_list(self):
+        living_spaces = self.rooms['living_space']
+        if len(living_spaces) > 0:
+            if len(self.living_space_waiting_list) > 0:
+                for person in self.living_space_waiting_list:
+                    random_living_space = self.allocate_room("livingspace")
+                    if len(random_living_space.occupants) < random_living_space.capacity:
+                        random_living_space.occupants.append(person)
+                        print("You have be allocted to room {}".format(
+                            person.first_name))
+            else:
+                print("There are no people in the waiting list")
+        else:
+            print("No livingspaces available")
+
     def load_people(self):
         pass
 
@@ -185,6 +215,10 @@ class Amity:
             return msg
         else:
             return "No offices available"
+        if filename:
+            file = open(filename, 'w')
+            file.write(msg)
+            file.close(msg)
 
     def print_unallocated(self, filename=None):
         # print people not allocated to office
