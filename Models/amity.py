@@ -31,16 +31,13 @@ class Amity:
                     room = LivingSpace(room_name)
                     self.rooms['living_space'].append(room)
                     print('{} successfully created'.format(room_name))
-    # pick a room at random to allocate a person
 
     def allocate_room(self, room_type):
         room_type = room_type.upper()
         if room_type == "OFFICE":
             offices = self.rooms['office']
             if len(offices):
-                # select a random office
                 return random.choice(self.rooms['office'])
-
         elif room_type == 'LIVINGSPACE':
             living_spaces = self.rooms['living_space']
             if len(living_spaces):
@@ -133,7 +130,6 @@ class Amity:
         for room in all_rooms:
             if room.room_name == room_name:
                 new_room = room
-
         previous_rooms = []
         for room in all_rooms:
             if person in room.occupants:
@@ -147,7 +143,6 @@ class Amity:
                 return 'Cannot reallocate staff to livingspace'
             if not type(new_room) in [type(room) for room in previous_rooms]:
                 return 'Cannot reallocate from one room type to a different one'
-            print(previous_rooms, new_room)
             if len(new_room.occupants) == new_room.capacity:
                 return 'Room is full'
             if new_room in previous_rooms:
@@ -179,9 +174,9 @@ class Amity:
     def print_allocations(self, filename=None):
         all_rooms = self.rooms["office"] + self.rooms["living_space"]
         msg = ''
-        if len(all_rooms):
+        if len(all_rooms) > 0:
             for room in all_rooms:
-                if len(room.occupants):
+                if len(room.occupants) > 0:
                     msg += room.room_name
                     msg += "\n---------------------------\n"
                     for person in room.occupants:
@@ -225,6 +220,12 @@ class Amity:
                 print(living_space.room_name)
         else:
             print("There are no livingspaces")
+
+    def print_room(self):
+        all_rooms = self.rooms["office"] + self.rooms["living_space"]
+        for room in all_rooms:
+            for person in room.occupants:
+                print(person.first_name, person.last_name)
 
     def save_state(self):
         # create database

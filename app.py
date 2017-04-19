@@ -112,6 +112,12 @@ class Amityapp(cmd.Cmd):
         self.amity.print_all_rooms()
 
     @docopt_cmd
+    def do_print_room(self, arg):
+        """Usage: print_all_rooms <room_name>"""
+        room_name = arg['<room_name>']
+        self.amity.print_room()
+
+    @docopt_cmd
     def do_print_available_rooms(self, arg):
         """Usage: print_available_rooms"""
         self.amity.print_available_rooms()
