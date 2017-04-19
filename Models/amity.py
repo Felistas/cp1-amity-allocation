@@ -266,30 +266,28 @@ class Amity:
             for person in room.occupants:
                 print(person.first_name, person.last_name)
 
-    def save_state(self):
+    def save_state(self, dbname):
         # create database
-        conn = sqlite3.connect('pr-amity.db')
+        conn = sqlite3.connect(dbname)
         # create object to manage queries
         curs = conn.cursor()
-        curs.execute("CREATE TABLE IF NOT EXISTS allocated"
-                     "(aID INTEGER PRIMARY KEY UNIQUE,"
-                     "rooms TEXT, occupants TEXT)")
+        curs.execute("""CREATE TABLE IF NOT EXISTS allocated (aID INTEGER PRIMARY KEY UNIQUE,
+                     rooms TEXT, occupants TEXT)""")
         all_rooms = self.rooms["office"] + self.rooms["living_space"]
-        for room_name in all_rooms:
-            occupants = room_name.occupants
-            person = [i for i in occupants]
-            curs.execute(
-                "INSERT INTO allocated (rooms, occupants) VALUES (room_name, person)")
-        curs.execute("CREATE TABLE IF NOT EXISTS unallocated"
-                     "(aID INTEGER PRIMARY KEY UNIQUE,"
-                     "office_waiting_list TEXT, living_space_waiting_list TEXT)")
-        office_waiting_list = pickle.dumps(Amity.office_waiting_list)
-        living_space_waiting_list = pickle.dumps(
-            Amity.living_space_waiting_list)
-
-        curs.execute("INSERT INTO unallocated VALUES (null, ?, ?);",
-                     (office_waiting_list, living_space_waiting_list))
-
+        for room in all_rooms:
+            for person in room.occupants:
+                person = person.first_name
+                curs.execute(
+                    "INSERT INTO allocated (rooms, occupants) VALUES (?, ?)", (room.room_name, person))
+        curs.execute("""CREATE TABLE IF NOT EXISTS unallocated
+                     (aID INTEGER PRIMARY KEY UNIQUE,
+                     office_waiting_list TEXT, living_space_waiting_list TEXT)""")
+        for person in self.living_space_waiting_list:
+            person = person.first_name
+        for person in self.office_waiting_list:
+            person = person.first_name
+        curs.execute("INSERT INTO unallocated (office_waiting_list,living_space_waiting_list) VALUES (?, ?)",
+                     (person, person))
         conn.commit()
         conn.close()
         return 'Data successfully exported to the Database'

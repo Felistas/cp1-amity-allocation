@@ -140,7 +140,7 @@ class Amityapp(cmd.Cmd):
     def do_save_state(self, args):
         """Usage: save_state [--db=sqlite_database]"""
         db_name = args['--db']
-        self.amity.save_state()
+        self.amity.save_state(args['--db'])
 
     @docopt_cmd
     def do_load_state(self, args):
