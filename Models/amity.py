@@ -26,11 +26,11 @@ class Amity:
                 if room_type == 'OFFICE':
                     room = Office(room_name)
                     self.rooms['office'].append(room)
-                    print('{} successfully created'.format(room_name))
+                    print('Office {} successfully created'.format(room_name))
                 elif room_type == 'LIVINGSPACE':
                     room = LivingSpace(room_name)
                     self.rooms['living_space'].append(room)
-                    print('{} successfully created'.format(room_name))
+                    print('Living Space {} successfully created'.format(room_name))
 
     def allocate_room(self, room_type):
         room_type = room_type.upper()
@@ -47,55 +47,60 @@ class Amity:
             return 'Invalid room type'
 
     def add_person(self, role, first_name, last_name, accommodation="NO"):
-        role = role.upper()
-        first_name = first_name.upper()
-        last_name = last_name.upper()
-        accommodation = (accommodation.upper()
-                         if accommodation is not None else "NO")
-        if role == 'FELLOW':
-            # create fellow object
-            fellow = Fellow(role, first_name, last_name, accommodation)
-            self.people.append(fellow)
-            print('{} {} {} successfully added'.format(
-                fellow.role, fellow.first_name, fellow.last_name))
-            # allocate office
-            office_selected_random = self.allocate_room("office")
-            if office_selected_random:
-                if len(office_selected_random.occupants) < office_selected_random.capacity:
-                    office_selected_random.occupants.append(fellow)
-                    print('You have been allocated to office' +
-                          office_selected_random.room_name)
-            else:
-                self.office_waiting_list.append(fellow)
-                print('You have been added to office waiting list')
-            if accommodation == 'YES':
-                    # check if there are available livigspaces and offices
-                living_space_selected_random = self.allocate_room("livingspace")
-                if living_space_selected_random:
-                    if len(living_space_selected_random.occupants) < living_space_selected_random.capacity:
-                        living_space_selected_random.occupants.append(fellow)
-                        print('You have been allocated to living space' +
-                              living_space_selected_random.room_name)
-                else:
-                    self.living_space_waiting_list.append(fellow)
-                    print('You have been added to livingspace waiting list')
-        elif role == 'STAFF':
-            staff = Staff(role, first_name, last_name,  accommodation)
-            self.people.append(staff)
-            print('{} {} {} successfully added'.format(
-                staff.role, staff.first_name, staff.last_name))
-            if accommodation == 'YES':
-                print("Staff cannot get accommodation")
-            else:
+        if first_name.isalpha() is False and last_name.isalpha() is False and role.isalpha():
+            print("Invalid input")
+        else:
+            role = role.upper()
+            first_name = first_name.upper()
+            last_name = last_name.upper()
+            accommodation = (accommodation.upper()
+                             if accommodation is not None else "NO")
+            if role == 'FELLOW':
+                # create fellow object
+                fellow = Fellow(role, first_name, last_name, accommodation)
+                self.people.append(fellow)
+                print('Fellow {} {} {} successfully added'.format(
+                    fellow.role, fellow.first_name, fellow.last_name))
+                # allocate office
                 office_selected_random = self.allocate_room("office")
                 if office_selected_random:
                     if len(office_selected_random.occupants) < office_selected_random.capacity:
-                        office_selected_random.occupants.append(staff)
+                        office_selected_random.occupants.append(fellow)
                         print('You have been allocated to office' +
                               office_selected_random.room_name)
                 else:
-                    self.office_waiting_list.append(staff)
+                    self.office_waiting_list.append(fellow)
                     print('You have been added to office waiting list')
+                if accommodation == 'YES':
+                        # check if there are available livigspaces and offices
+                    living_space_selected_random = self.allocate_room(
+                        "livingspace")
+                    if living_space_selected_random:
+                        if len(living_space_selected_random.occupants) < living_space_selected_random.capacity:
+                            living_space_selected_random.occupants.append(
+                                fellow)
+                            print('You have been allocated to living space' +
+                                  living_space_selected_random.room_name)
+                    else:
+                        self.living_space_waiting_list.append(fellow)
+                        print('You have been added to livingspace waiting list')
+            elif role == 'STAFF':
+                staff = Staff(role, first_name, last_name,  accommodation)
+                self.people.append(staff)
+                print('{} {} {} successfully added'.format(
+                    staff.role, staff.first_name, staff.last_name))
+                if accommodation == 'YES':
+                    print("Staff cannot get accommodation")
+                else:
+                    office_selected_random = self.allocate_room("office")
+                    if office_selected_random:
+                        if len(office_selected_random.occupants) < office_selected_random.capacity:
+                            office_selected_random.occupants.append(staff)
+                            print('You have been allocated to office' +
+                                  office_selected_random.room_name)
+                    else:
+                        self.office_waiting_list.append(staff)
+                        print('You have been added to office waiting list')
 
     def print_person_id(self, first_name, last_name):
         """ Print the person id given the person name"""
@@ -123,7 +128,7 @@ class Amity:
         person = [person for person in self.people if int(person_id) ==
                   person.person_id]
         if len(person) == 0:
-            return 'Person does not exist'
+            return '{} does not exist'.format(person.first_name)
         person = person[0]
         all_rooms = self.rooms['office'] + self.rooms['living_space']
         new_room = None
@@ -135,14 +140,14 @@ class Amity:
             if person in room.occupants:
                 previous_rooms.append(room)
         if len(previous_rooms) == 0:
-            return 'Person had been allocated a room'
+            return '{} had been allocated a room'.format(person.first_name)
         if new_room is not None:
             room_type = type(new_room)
             role = person.role.upper()
             if role == 'STAFF' and room_type == LivingSpace:
                 return 'Cannot reallocate staff to livingspace'
             if not type(new_room) in [type(room) for room in previous_rooms]:
-                return 'Cannot reallocate from one room type to a different one'
+                return 'Cannot reallocate from one room type to another one'
             if len(new_room.occupants) == new_room.capacity:
                 return 'Room is full'
             if new_room in previous_rooms:
@@ -152,7 +157,7 @@ class Amity:
                     room.occupants.remove(person)
             new_room.occupants.append(person)
             return 'Successfully reallocated to {}'.format(new_room.room_name)
-        return 'Room does not exist'
+        return '{} does not exist'.format(new_room.room_name)
 
     def allocate_office_waiting_list(self):
         offices = self.rooms['office']
@@ -292,22 +297,23 @@ class Amity:
         conn.close()
         return 'Data successfully exported to the Database'
 
-    def load_state(self):
+    def load_state(self, dbname):
         try:
-            conn = sqlite3.connect('amity.db')
+            conn = sqlite3.connect(dbname)
             curs = conn.cursor()
-
             curs.execute(
-                "SELECT * FROM data WHERE aID = (SELECT MAX(aID) FROM data)")
+                "SELECT * FROM allocated WHERE aID = (SELECT MAX(aID) FROM allocated)")
             data = conn.fetchone()
-
-            Amity.rooms = pickle.loads(data[1])
-            Room.occupants = pickle.loads(data[2])
-            Amity.office_waiting_list = pickle.loads(data[3])
-            Amity.living_space_waiting_list = pickle.loads(data[4])
+            for row in allocated:
+                print row[0], row[1]
 
             curs.close()
+            conn.close()
+            curs.execute(
+                "SELECT * FROM unallocated WHERE aID = (SELECT MAX(aID) FROM unallocated)")
+            data = conn.fetchone()
+            for row in unallocated:
+                print row[0], row[1]
             return 'Successfully loaded data from the Database!'
         except Error:
-            remove('amity.db')
-            return "Database not found, Please check the name and try again!"
+            return "Database not found"
