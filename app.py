@@ -156,16 +156,10 @@ class Amityapp(cmd.Cmd):
         exit()
 
 
-opt = docopt(__doc__, sys.argv[1:])
-
-if opt['--interactive']:
+if __name__ == '__main__':
+    #opt = docopt(__doc__, sys.argv[1:])
+    opt = (__doc__)
+    print(opt)
     Amityapp().cmdloop()
-    # a = Amity()
-    # a.create_room("livingspace", ["block"])
-    # for x in range(1, 9):
-    #     a.add_person("fellow", "shera" + str(x), "ngumi", 'Y')
-    # b = a.print_unallocated()
-    # print(b)
 
-
-print(opt)
+# if opt['--interactive']:

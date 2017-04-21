@@ -21,13 +21,13 @@ class ModelsTest(unittest.TestCase):
     def test_office_created_successfully(self):
         """Asserts that an office has been successfully been created"""
         new_office = self.amity.create_room("office", ["camelot"])
-        self.assertIn("Office camelot successfully created",
+        self.assertIn("Successfully created Office camelot",
                       new_office)
 
     def test_livingspace_created_successfully(self):
         """Asserts livingspace has been successfully been created"""
         new_living_space = self.amity.create_room("livingspace", ["php"])
-        self.assertIn("Living Space php successfully created",
+        self.assertIn("Successfully created Living Space php",
                       new_living_space)
 
     def test_cannot_allocate_invalid_roomtype(self):
@@ -113,6 +113,66 @@ class ModelsTest(unittest.TestCase):
         reallocate_staff = self.amity.reallocate_person(staff_id[0], 'topaz')
         self.assertIn('Cannot reallocate staff to livingspace',
                       reallocate_staff)
+
+    def test_cannot_reallocate_fellow_to_livingspace(self):
+        """Assert cannot reallocate to different room type"""
+        self.amity.rooms['living_space'] = []
+        fellow = self.amity.add_person("fellow", "olivia", "onyango")
+        new_living_space = self.amity.create_room("livingspace", ["php"])
+        staff_id = self.amity.print_person_id("olivia", "onyango").split(' ')
+        reallocate_fellow = self.amity.reallocate_person(staff_id[0], 'php')
+        self.assertIn(
+            'Cannot reallocate from one room type to another', reallocate_fellow)
+
+    def test_cannot_reallocate_to_full_room(self):
+        """Assert that one cannot be reallocated to a full room"""
+        self.amity.rooms['office'] = []
+        self.amity.create_room("office", ["narnia"])
+        self.amity.add_person("fellow", "oliva", "munala")
+        self.amity.add_person("fellow", "batian", "yokozuna")
+        self.amity.add_person("fellow", "humphrey", "stick")
+        self.amity.add_person("fellow", "sharon", "robley")
+        self.amity.add_person("fellow", "joshua", "kamau")
+        self.amity.add_person("fellow", "ivan", "pycharm")
+        self.amity.create_room("office", ["nairobi"])
+        self.amity.add_person("fellow", "gideon", "gandalf")
+        fellow_id = self.amity.print_person_id("gideon", "gandalf").split(' ')
+        reallocate_fellow = self.amity.reallocate_person(fellow_id[0], 'narnia')
+        self.assertIn('Room is full', reallocate_fellow)
+
+    def test_cannot_reallocate_to_same_room(self):
+        """Assert that a person cannot be reallocated to the same room"""
+        self.amity.rooms['office'] = []
+        self.amity.create_room("office", ["narnia"])
+        self.amity.add_person("fellow", "ivan", "pycharm")
+        fellow_id = self.amity.print_person_id("ivan", "pycharm").split(' ')
+        reallocate_fellow = self.amity.reallocate_person(fellow_id[0], 'narnia')
+        self.assertIn('Cannot reallocate to the same room', reallocate_fellow)
+
+    def test_reallocate_person_successfully(self):
+        """Assert that a person has been successfully reallocated to a room"""
+        self.amity.rooms['office'] = []
+        self.amity.create_room("office", ["narnia"])
+        self.amity.add_person("fellow", "ivan", "pycharm")
+        self.amity.create_room("office", ["meru"])
+        fellow_id = self.amity.print_person_id("ivan", "pycharm").split(' ')
+        reallocate_fellow = self.amity.reallocate_person(fellow_id[0], 'meru')
+        self.assertIn('Successfully reallocated to meru', reallocate_fellow)
+
+    def test_cannot_allocate_office_waiting_list_if_no_office(self):
+        """Assert person in office list cannot be allocated to a room if there is no office available"""
+        self.amity.rooms['office'] = []
+        self.amity.add_person("fellow", "ivan", "pycharm")
+        allocate_office = self.amity.allocate_office_waiting_list()
+        self.assertIn('No office available', allocate_office)
+
+    def test_cannot_allocate_office_waiting_list(self):
+        """Assert alloated people in office list to an office"""
+        self.amity.rooms['office'] = []
+        self.amity.add_person("fellow", "ivan", "pycharm")
+        self.amity.create_room("office", ["toll"])
+        allocate = self.amity.allocate_office_waiting_list()
+        self.assertIn('You have been allocted to room toll', allocate)
 
     def test_save_test(self):
         """Asserts that state is not saved if not provided database name"""
