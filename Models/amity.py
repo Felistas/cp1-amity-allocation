@@ -127,13 +127,13 @@ class Amity:
         msg = ''
         first_name = first_name.upper()
         last_name = last_name.upper()
-        ids = [person.person_id for person in self.people if first_name ==
+        ids = [person for person in self.people if first_name ==
                person.first_name and last_name == person.last_name]
-        for person_id in ids:
-            if person_id:
-                msg += person_id, first_name, last_name
-            else:
-                msg += "Person does not exist"
+        if len(ids) > 0:
+            msg += (str(ids[0].person_id) + ' ' +
+                    ids[0].first_name + ' ' + ids[0].last_name)
+        else:
+            msg += "Person does not exist"
         return msg
 
     def reallocate_person(self, person_id, room_name):
@@ -181,7 +181,7 @@ class Amity:
                     room.occupants.remove(person)
             new_room.occupants.append(person)
             return 'Successfully reallocated to {}'.format(new_room.room_name)
-        return '{} does not exist'.format(new_room.room_name)
+        return '{} does not exist'.format(room_name)
 
     def allocate_office_waiting_list(self):
         '''

@@ -96,109 +96,36 @@ class ModelsTest(unittest.TestCase):
         new_staff = self.amity.add_person("staff", "ken", "olalo")
         self.assertIn("You have been added to office waiting list", new_staff)
 
+    def test_cannot_print_id_of_non_existent_person(self):
+        """Asserts that a non existent person cannot have person id"""
+        person = self.amity.print_person_id("ganla", "janla")
+        self.assertEqual('Person does not exist', person)
+
     def test_cannot_reallocate_a_non_existent_person(self):
         """Asserts cannot reallocate a person who does not exist"""
         reallocate_person = self.amity.reallocate_person('1233', 'tsavo')
-        self.assertIn('1233 does not exist', reallocate_person,
-                      msg='1233 does not exist')
+        self.assertIn('1233 does not exist', reallocate_person)
 
     def test_cannot_reallocate_staff_to_livingspace(self):
         """Asserts that cannot reallocate staff to livingspace"""
-        reallocate_staff = self.amity.reallocate_person('4543212', '[topaz]')
+        staff = self.amity.add_person("staff", "paul", "upendo")
+        staff_id = self.amity.print_person_id("paul", "upendo").split(' ')
+        reallocate_staff = self.amity.reallocate_person(staff_id[0], 'topaz')
         self.assertIn('Cannot reallocate staff to livingspace',
-                      reallocate_staff, msg='Cannot reallocate staff to livingspace')
-
-    # def test_fellow_gets_an_office(self):
-    #     """Asserts fellow has been allocated a room successfully"""
-    #     new_fellow = self.amity.add_person("fellow", "maryann", "ngumi", "Y")
-    #     self.assertIn("FELLOW MARYANN NGUMI successfully added",
-    #                   new_fellow, msg='FELLOW MARYANN NGUMI successfully added')
-    #
-
-        #
-    # def test_add_staff_who_wants_accommodation(self):
-    #     """Assert that staff cannot get accommodation"""
-    #     msg_staff = self.amity.add_person("wambui", "staff", "Y")
-    #     self.assertEqual(msg_staff, "Staff cannot get accommodation")
-    #
-    # def test_staff_allocated_officespace(self):
-    #     """Asserts that staff has been allocated office space"""
-    #     msg_staff = self.amity.add_person("staff", "tsavo", "N")
-    #     msg_staff = self.assertEqual(
-    #         self.amity.add_person, "Staff has been allocated office")
-    #
-    # def test_fellow_allocated_office_and_livingspace(self):
-    #     """"Asserts that fellow has been allocated livingspace and office"""
-    #     msg_fellow = self.amity.add_person("shera", "tsavo", "oculus")
-    #     msg_fellow = self.assertEqual(
-    #         self.amity.add_person, "Fellow has been allocated office and livingspace")
-    #
-    # def test_reallocate_person(self):
-    #     """Asserts that person has been reallocated successfully"""
-    #     msg_reallocate = self.amity.reallocate_person('001', 'state')
-    #     msg_reallocate = self.assertEqual(
-    #         msg_reallocate, "Reallocated person successfully")
-    #
-    # def test_reallocate_to_ghost_room(self):
-    #     """Asserts that one cannot allocate a non-existent room"""
-    #     msg_reallocate = self.amity.reallocate_person('001', 'camelot')
-    #     msg_reallocate = self.assertEqual(msg_reallocate, "Room does not exist")
-    #
-    # def test_reallocate_to_full_room(self):
-    #     """Asserts that a person cannot be reallocated to a full room"""
-    #     msg_reallocate = self.amity.reallocate_person('001', 'tsavo')
-    #     msg_reallocate = self.assertEqual(msg_reallocate, "No space available")
-    #
-    # def test_cannot_reallocate_same_room(self):
-    #     """Asserts that a person cannot be reallocated in the same room"""
-    #     msg_reallocate = self.amity.reallocate_person("001", "tsavo")
-    #     msg_reallocate = self.assertEqual(
-    #         msg_reallocate, "Cannot reallocate a person in the same room")
-    #
-    # def test_cannot_reallocate_staff(self):
-    #     """Asserts that a staff cannot be reallocated from office to livingspace"""
-    #     msg_reallocate = self.amity.reallocate_person("002", "oculus")
-    #     msg_reallocate = self.assertEqual(
-    #         msg_reallocate, "Staff cannot be reallocated to livingspace")
-    #
-    # def test_print_allocated_rooms(self):
-    #     """Asserts that allocated rooms are printed"""
-    #     msg_allocations = self.amity.print_allocation
-    #     self.assertTrue(msg_allocations, "List of allocated rooms")
-    #
-    # def test_print_unallocated_rooms(self):
-    #     """Asserts that unallocated rooms are printed"""
-    #     msg_unallocated = self.amity.print_unallocated
-    #     self.assertEqual(msg_unallocated, "List of unallocated rooms")
-    #
-    # def test_print_all_rooms(self):
-    #     """Asserts that a list of all rooms are printed"""
-    #     msg_all_rooms = self.amity.print_room
-    #     self.assertEqual(msg_all_rooms, "List of all rooms available")
-    #
+                      reallocate_staff)
 
     def test_save_test(self):
         """Asserts that state is not saved if not provided database name"""
         msg_save_state = self.amity.save_state("")
         self.assertIn('Save state was Unsuccessfull',
-                      msg_save_state, "Save state was Unsuccessfull")
+                      msg_save_state)
 
     def test_save_test(self):
         """Asserts that state is saved successfully"""
         msg_save_state = self.amity.save_state("amity")
         self.assertIn('Data successfully exported to the Database',
-                      msg_save_state, "Data successfully exported to the Database")
+                      msg_save_state)
 
-    # def test_load_state(self):
-    #     """Assert that load state was done successfully"""
-    #     msg_load_state = self.amity.load_state("amity")
-    #     self.assertTrue('Successfully loaded data from the Database',
-    #                     msg_load_state)
-    #
-    # def test_load_people(self):
-    #     """Asserts that loads people is successfull"""
-    #     msg_load_state = self.amity.load_state
-    #     self.assertTrue(msg_load_state, "Load successfull")
     def tearDown(self):
         Amity.rooms = {'living_space': [], 'office': []}
         Amity.people = []
