@@ -13,6 +13,13 @@ class Amity:
     living_space_waiting_list = []
 
     def create_room(self, room_type, room_names):
+        '''
+        Gets a list of all rooms
+        Checks if a room exists
+        Creates office
+        Creates living space
+        '''
+        msg = ''
         room_type = room_type.upper()
         # check for already existing room
         for room_name in room_names:
@@ -20,19 +27,26 @@ class Amity:
             check_room = [
                 room.room_name for room in all_rooms if room.room_name == room_name]
             if check_room:
-                print('{} already exists'.format(room_name))
+                msg += '{} already exists'.format(room_name)
             else:
                 # create office and livingspace
                 if room_type == 'OFFICE':
                     room = Office(room_name)
                     self.rooms['office'].append(room)
-                    print('Office {} successfully created'.format(room_name))
+                    msg += 'Office {} successfully created'.format(room_name)
                 elif room_type == 'LIVINGSPACE':
                     room = LivingSpace(room_name)
                     self.rooms['living_space'].append(room)
-                    print('Living Space {} successfully created'.format(room_name))
+                    msg += 'Living Space {} successfully created'.format(
+                        room_name)
+        return msg
 
     def allocate_room(self, room_type):
+        '''
+        Selects an office at random
+        Selects a living space at random
+        Checks that room type should be either livingspace or office
+        '''
         room_type = room_type.upper()
         if room_type == "OFFICE":
             offices = self.rooms['office']
@@ -41,14 +55,22 @@ class Amity:
         elif room_type == 'LIVINGSPACE':
             living_spaces = self.rooms['living_space']
             if len(living_spaces):
-                # select a random living  space
                 return random.choice(self.rooms['living_space'])
         else:
             return 'Invalid room type'
 
     def add_person(self, role, first_name, last_name, accommodation="NO"):
+        '''
+        Validates that person names and roles should be strings
+        Adds a staff and assign them an office
+        Adds fellow and assign them living space and office
+        Handle staff cannot get accommodation
+        If no available offices add to office waiting list
+        If no available living spaces add to living_space waiting list
+        '''
+        msg = ''
         if first_name.isalpha() is False and last_name.isalpha() is False and role.isalpha():
-            print("Invalid input")
+            msg += "Invalid input"
         else:
             role = role.upper()
             first_name = first_name.upper()
@@ -59,19 +81,18 @@ class Amity:
                 # create fellow object
                 fellow = Fellow(role, first_name, last_name, accommodation)
                 self.people.append(fellow)
-                print('Fellow {} {} {} successfully added'.format(
-                    fellow.role, fellow.first_name, fellow.last_name))
+                msg += '{} {} {} successfully added'.format(
+                    fellow.role, fellow.first_name, fellow.last_name)
                 # allocate office
                 office_selected_random = self.allocate_room("office")
                 if office_selected_random:
                     if len(office_selected_random.occupants) < office_selected_random.capacity:
                         office_selected_random.occupants.append(fellow)
-                        print('You have been allocated to office' +
-                              office_selected_random.room_name)
+                        msg += 'You have been allocated to office ' + office_selected_random.room_name
                 else:
                     self.office_waiting_list.append(fellow)
-                    print('You have been added to office waiting list')
-                if accommodation == 'YES':
+                    msg += 'You have been added to office waiting list'
+                if accommodation == 'YES' or accommodation == 'Y':
                         # check if there are available livigspaces and offices
                     living_space_selected_random = self.allocate_room(
                         "livingspace")
@@ -79,40 +100,42 @@ class Amity:
                         if len(living_space_selected_random.occupants) < living_space_selected_random.capacity:
                             living_space_selected_random.occupants.append(
                                 fellow)
-                            print('You have been allocated to living space' +
-                                  living_space_selected_random.room_name)
+                            msg += 'You have been allocated to living space ' + \
+                                living_space_selected_random.room_name
                     else:
                         self.living_space_waiting_list.append(fellow)
-                        print('You have been added to livingspace waiting list')
+                        msg += 'You have been added to livingspace waiting list '
             elif role == 'STAFF':
                 staff = Staff(role, first_name, last_name,  accommodation)
                 self.people.append(staff)
-                print('{} {} {} successfully added'.format(
-                    staff.role, staff.first_name, staff.last_name))
-                if accommodation == 'YES':
-                    print("Staff cannot get accommodation")
+                msg += '{} {} {} successfully added'.format(
+                    staff.role, staff.first_name, staff.last_name)
+                if accommodation == 'YES' or accommodation == "Y":
+                    msg += "Staff cannot get accommodation"
                 else:
                     office_selected_random = self.allocate_room("office")
                     if office_selected_random:
                         if len(office_selected_random.occupants) < office_selected_random.capacity:
                             office_selected_random.occupants.append(staff)
-                            print('You have been allocated to office' +
-                                  office_selected_random.room_name)
+                            msg += 'You have been allocated to office ' + office_selected_random.room_name
                     else:
                         self.office_waiting_list.append(staff)
-                        print('You have been added to office waiting list')
+                        msg += 'You have been added to office waiting list'
+        return msg
 
     def print_person_id(self, first_name, last_name):
         """ Print the person id given the person name"""
+        msg = ''
         first_name = first_name.upper()
         last_name = last_name.upper()
         ids = [person.person_id for person in self.people if first_name ==
                person.first_name and last_name == person.last_name]
         for person_id in ids:
             if person_id:
-                print(person_id, first_name, last_name)
+                msg += person_id, first_name, last_name
             else:
-                print("Person does not exist")
+                msg += "Person does not exist"
+        return msg
 
     def reallocate_person(self, person_id, room_name):
         ''' check if the room the user chooses exists
@@ -124,11 +147,12 @@ class Amity:
         append person to the new room
         check person should not be reallocated to the same room
         '''
+        msg = ''
         # check if the room exists
         person = [person for person in self.people if int(person_id) ==
                   person.person_id]
         if len(person) == 0:
-            return '{} does not exist'.format(person.first_name)
+            return '{} does not exist'.format(person_id)
         person = person[0]
         all_rooms = self.rooms['office'] + self.rooms['living_space']
         new_room = None
@@ -160,6 +184,7 @@ class Amity:
         return '{} does not exist'.format(new_room.room_name)
 
     def allocate_office_waiting_list(self):
+        msg = ''
         offices = self.rooms['office']
         if len(offices) > 0:
             if len(self.office_waiting_list) > 0:
@@ -167,14 +192,16 @@ class Amity:
                     random_office = self.allocate_room("office")
                     if len(random_office.occupants) < random_office.capacity:
                         random_office.occupants.append(person)
-                        print("You have be allocted to room {}".format(
-                            person.first_name))
+                        msg += "You have be allocted to room {}".format(
+                            person.first_name)
             else:
-                print("There are no people in the waiting list")
+                msg += "There are no people in the waiting list"
         else:
-            print("No office available")
+            msg += "No office available"
+        return msg
 
     def allocate_livingspace_waiting_list(self):
+        msg = ''
         living_spaces = self.rooms['living_space']
         if len(living_spaces) > 0:
             if len(self.living_space_waiting_list) > 0:
@@ -182,29 +209,32 @@ class Amity:
                     random_living_space = self.allocate_room("livingspace")
                     if len(random_living_space.occupants) < random_living_space.capacity:
                         random_living_space.occupants.append(person)
-                        print("You have be allocted to room {}".format(
-                            person.first_name))
+                        msg += "You have be allocted to room {}".format(
+                            person.first_name)
             else:
-                print("There are no people in the waiting list")
+                msg += "There are no people in the waiting list"
         else:
-            print("No livingspaces available")
+            msg += "No livingspaces available"
+        return msg
 
     def load_people(self):
         pass
 
     def print_available_rooms(self):
+        msg = ''
         if len(office.occupants) < office.capacity:
             offices = self.rooms['office']
             for office in offices:
-                print(office.room_name)
+                msg += office.room_name
         else:
-            print("No empty offices available")
+            msg += "No empty offices available"
         if len(living_space.occupants) < living_space.capacity:
             living_spaces = self.rooms['living_space']
             for living_space in living_spaces:
-                print(living_space.room_name)
+                msg += living_space.room_name
         else:
-            print("No empty living spaces available")
+            msg += "No empty living spaces available"
+        return msg
 
     def print_allocations(self, filename=None):
         all_rooms = self.rooms["office"] + self.rooms["living_space"]
@@ -213,13 +243,13 @@ class Amity:
             for room in all_rooms:
                 if len(room.occupants) > 0:
                     msg += room.room_name
-                    msg += "\n---------------------------\n"
+                    msg += "\n --------------------------- \n"
                     for person in room.occupants:
                         msg += (person.first_name + " " +
                                 person.last_name + ",")
             return msg
         else:
-            return "No offices available"
+            return "No rooms available"
         if filename:
             file = open(filename, 'w')
             file.write(msg)
@@ -227,17 +257,18 @@ class Amity:
 
     def print_unallocated(self, filename=None):
         # print people not allocated to office
+        msg = ''
         if len(Amity.office_waiting_list) == 0 and len(Amity.living_space_waiting_list) == 0:
             return "Everyone within the system has an office or livingspace"
         else:
-            print("People not allocated to office \n")
-            print("---------------------------")
+            msg += "People not allocated to office \n"
+            msg += "---------------------------"
             unallocated_office_space = '\n'.join(str(
                 person.person_id) + ' ' + person.first_name + ' ' + person.last_name for person in Amity.office_waiting_list)
             return unallocated_office_space
             # print people not allocated to living space
-            print("People not allocated to living space \n")
-            print("---------------------------")
+            msg += "People not allocated to living space \n"
+            msg += "---------------------------"
             unallocated_living_space = '\n'.join(str(
                 person.person_id) + ' ' + person.first_name + ' ' + person.last_name for person in Amity.living_space_waiting_list)
             return unallocated_living_space
@@ -246,74 +277,78 @@ class Amity:
             file.write(unallocated_office_space)
             file.write(unallocated_living_space)
             file.close()
+        return msg
 
     def print_all_rooms(self):
         offices = list(Amity.rooms['office'])
+        msg = ''
         if len(offices) > 0:
             for office in offices:
-                print("OFFICES")
-                print("---------------------------")
-                print(office.room_name)
+                msg += "OFFICES"
+                msg += "---------------------------"
+                msg += office.room_name
         else:
-            print("There are no offices")
+            msg += "There are no offices"
         living_spaces = list(self.rooms['living_space'])
         if len(living_spaces) > 0:
             for living_space in living_spaces:
-                print("LIVING SPACES")
-                print("---------------------------")
-                print(living_space.room_name)
+                msg += "LIVING SPACES"
+                msg += "---------------------------"
+                msg += living_space.room_name
         else:
-            print("There are no livingspaces")
+            msg += "There are no livingspaces"
+        return msg
 
     def print_room(self):
+        msg = ''
         all_rooms = self.rooms["office"] + self.rooms["living_space"]
         for room in all_rooms:
             for person in room.occupants:
-                print(person.first_name, person.last_name)
+                msg += person.first_name, person.last_name
+        return msg
 
     def save_state(self, dbname):
-        # create database
-        conn = sqlite3.connect(dbname)
-        # create object to manage queries
-        curs = conn.cursor()
-        curs.execute("""CREATE TABLE IF NOT EXISTS allocated (aID INTEGER PRIMARY KEY UNIQUE,
-                     rooms TEXT, occupants TEXT)""")
-        all_rooms = self.rooms["office"] + self.rooms["living_space"]
-        for room in all_rooms:
-            for person in room.occupants:
+        try:
+            # create database
+            conn = sqlite3.connect(dbname)
+            # create object to manage queries
+            curs = conn.cursor()
+            curs.execute("""CREATE TABLE IF NOT EXISTS allocated (aID INTEGER PRIMARY KEY UNIQUE,
+                         rooms TEXT, occupants TEXT)""")
+            all_rooms = self.rooms["office"] + self.rooms["living_space"]
+            for room in all_rooms:
+                for person in room.occupants:
+                    person = person.first_name
+                    curs.execute(
+                        "INSERT INTO allocated (rooms, occupants) VALUES (?, ?)", (room.room_name, person))
+            curs.execute("""CREATE TABLE IF NOT EXISTS unallocated
+                         (aID INTEGER PRIMARY KEY UNIQUE,
+                         office_waiting_list TEXT, living_space_waiting_list TEXT)""")
+            for person in self.living_space_waiting_list:
                 person = person.first_name
-                curs.execute(
-                    "INSERT INTO allocated (rooms, occupants) VALUES (?, ?)", (room.room_name, person))
-        curs.execute("""CREATE TABLE IF NOT EXISTS unallocated
-                     (aID INTEGER PRIMARY KEY UNIQUE,
-                     office_waiting_list TEXT, living_space_waiting_list TEXT)""")
-        for person in self.living_space_waiting_list:
-            person = person.first_name
-        for person in self.office_waiting_list:
-            person = person.first_name
-        curs.execute("INSERT INTO unallocated (office_waiting_list,living_space_waiting_list) VALUES (?, ?)",
-                     (person, person))
-        conn.commit()
-        conn.close()
-        return 'Data successfully exported to the Database'
+            for person in self.office_waiting_list:
+                person = person.first_name
+            curs.execute("INSERT INTO unallocated (office_waiting_list,living_space_waiting_list) VALUES (?, ?)",
+                         (person, person))
+            conn.commit()
+            conn.close()
+            return 'Data successfully exported to the Database'
+        except:
+            return 'Save state was Unsuccessfull'
 
     def load_state(self, dbname):
-        try:
-            conn = sqlite3.connect(dbname)
-            curs = conn.cursor()
-            curs.execute(
-                "SELECT * FROM allocated WHERE aID = (SELECT MAX(aID) FROM allocated)")
-            data = conn.fetchone()
-            for row in allocated:
-                print row[0], row[1]
-
-            curs.close()
-            conn.close()
-            curs.execute(
-                "SELECT * FROM unallocated WHERE aID = (SELECT MAX(aID) FROM unallocated)")
-            data = conn.fetchone()
-            for row in unallocated:
-                print row[0], row[1]
-            return 'Successfully loaded data from the Database!'
-        except Error:
-            return "Database not found"
+        conn = sqlite3.connect(dbname)
+        curs = conn.cursor()
+        curs.execute(
+            "SELECT * FROM allocated WHERE aID = (SELECT MAX(aID) FROM allocated)")
+        allocated = curs.fetchone()
+        for row in allocated:
+            print(row)
+        curs.close()
+        conn.close()
+        curs.execute(
+            "SELECT * FROM unallocated WHERE aID = (SELECT MAX(aID) FROM unallocated)")
+        data = conn.fetchone()
+        for row in unallocated:
+            print(row[1], row[2])
+        return 'Successfully loaded data from the Database'

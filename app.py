@@ -145,7 +145,8 @@ class Amityapp(cmd.Cmd):
     @docopt_cmd
     def do_load_state(self, args):
         """Usage: load_state [--db=sqlite_database]"""
-        self.amity.load_state()
+        db_name = args['--db']
+        self.amity.load_state(args['--db'])
 
     def do_quit(self, arg):
         """Quits out of Interactive Mode."""
