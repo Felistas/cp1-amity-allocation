@@ -231,7 +231,9 @@ class Amity:
         return msg
 
     def load_people(self):
-        pass
+        file_name = open(amity.txt, r)
+        for line in file_name:
+            for word in line.split():
 
     def print_available_rooms(self):
         '''

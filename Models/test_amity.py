@@ -54,9 +54,11 @@ class ModelsTest(unittest.TestCase):
         self.assertIn("FELLOW MARYANN NGUMI successfully added",
                       new_fellow, msg='FELLOW MARYANN NGUMI successfully added')
 
-    def test_allocated_to_livingspace(self):
+    def test_person_allocated_to_livingspace(self):
         """Asserts that fellow has been allocated a livingspace successfully"""
-        pass
+        self.amity.create_room("livingspace", ["php"])
+        allocate_fellow = self.add_person("Fellow", "Alex", "Mbugua", "Y")
+        self.assertIn()
 
     def test_cannot_reallocate_a_non_existent_person(self):
         """Asserts cannot reallocate a person who does not exist"""
