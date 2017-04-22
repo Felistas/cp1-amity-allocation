@@ -138,8 +138,9 @@ class Amity:
         ids = [person for person in self.people if first_name ==
                person.first_name and last_name == person.last_name]
         if len(ids) > 0:
-            msg += (str(ids[0].person_id) + ' ' +
-                    ids[0].first_name + ' ' + ids[0].last_name)
+            for id in ids:
+                msg += str(id.person_id) + ' ' + id.first_name + \
+                    ' ' + id.last_name + '\n'
         else:
             msg += "Person does not exist"
         return msg
