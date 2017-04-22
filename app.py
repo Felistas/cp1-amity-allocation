@@ -94,6 +94,11 @@ class Amityapp(cmd.Cmd):
             arg['<person_id>'], arg['<room_name>']))
 
     @docopt_cmd
+    def do_load_people(self, arg):
+        """Usage: load_people"""
+        print(self.amity.load_people())
+
+    @docopt_cmd
     def do_print_allocations(self, arg):
         """Usage: print_allocations [--o=filename]"""
         filename = arg['--o']
@@ -157,7 +162,7 @@ class Amityapp(cmd.Cmd):
 
 
 if __name__ == '__main__':
-    #opt = docopt(__doc__, sys.argv[1:])
+    # opt = docopt(__doc__, sys.argv[1:])
     opt = (__doc__)
     print(opt)
     Amityapp().cmdloop()

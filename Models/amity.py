@@ -243,11 +243,20 @@ class Amity:
         return msg
 
     def load_people(self):
-        file_name = open(amity.txt, r)
-        for line in file_name:
-            for word in line.split():
-
-                pass
+        with open('amity.txt') as f:
+            lines = f.readlines()
+            print(lines)
+            msg = ''
+            for line in lines:
+                line.replace(r"\n", " ")
+                l = line.split(' ')
+                first_name = l[0]
+                last_name = l[1]
+                role = l[2]
+                accommodation = (l[3] if len(l) > 3 else "NO")
+                msg += self.add_person(role, first_name,
+                                       last_name, accommodation)
+            return msg
 
     def print_available_rooms(self):
         '''
@@ -366,7 +375,7 @@ class Amity:
         for room in all_rooms:
             if len(room.occupants) > 0:
                 for person in room.occupants:
-                    msg += person.first_name, person.last_name
+                    msg += str(person.first_name, person.last_name)
             else:
                 msg += "There are no occupants in the room"
         return msg
