@@ -21,7 +21,6 @@ class Amity:
         '''
         msg = ''
         room_type = room_type.upper()
-        # check for already existing room
         for room_name in room_names:
             room_name = room_name.upper()
             all_rooms = self.rooms['office'] + self.rooms['living_space']
@@ -30,7 +29,6 @@ class Amity:
             if check_room:
                 msg += '\n{} already exists\n'.format(room_name)
             else:
-                # create office and livingspace
                 if room_type == 'OFFICE':
                     room = Office(room_name)
                     self.rooms['office'].append(room)
@@ -157,7 +155,6 @@ class Amity:
         Check person should not be reallocated to the same room
         '''
         msg = ''
-        # check if the room exists
         person = [person for person in self.people if int(person_id) ==
                   person.person_id]
         if len(person) == 0:
@@ -381,9 +378,7 @@ class Amity:
         Saves all objects in office waiting list and living space waiting list to the table
         """
         try:
-            # create database
             conn = sqlite3.connect(dbname)
-            # create object to manage queries
             curs = conn.cursor()
             curs.execute("""CREATE TABLE IF NOT EXISTS allocated (aID INTEGER PRIMARY KEY UNIQUE,
                          rooms TEXT, occupants TEXT)""")
@@ -413,18 +408,23 @@ class Amity:
         Fetches all data in allocated table in prints it on the screen
         Fetches all data in the unallocated table and prints it on the screen
         """
-        conn = sqlite3.connect(dbname)
-        curs = conn.cursor()
-        curs.execute(
-            "SELECT * FROM allocated WHERE aID = (SELECT MAX(aID) FROM allocated)")
-        allocated = curs.fetchone()
-        for row in allocated:
-            print(row)
-        curs.close()
-        conn.close()
-        curs.execute(
-            "SELECT * FROM unallocated WHERE aID = (SELECT MAX(aID) FROM unallocated)")
-        data = conn.fetchone()
-        for row in unallocated:
-            print(row[1], row[2])
-        return 'Successfully loaded data from the Database'
+        try:
+            msg = ''
+            conn = sqlite3.connect(dbname)
+            curs = conn.cursor()
+            curs.execute(
+                "SELECT * FROM allocated WHERE aID = (SELECT MAX(aID) FROM allocated)")
+            allocated = curs.fetchone()
+            for row in allocated:
+                print(row)
+            curs.close()
+            conn.close()
+            curs.execute(
+                "SELECT * FROM unallocated WHERE aID = (SELECT MAX(aID) FROM unallocated)")
+            data = conn.fetchone()
+            for row in unallocated:
+                print(row[1], row[2])
+            msg += 'Successfully loaded data from the Database'
+        except:
+            msg += "Provide database name"
+        return msg
