@@ -248,7 +248,7 @@ class Amity:
                 lines = f.readlines()
                 msg = ''
                 for line in lines:
-                    line.replace(r"\n", "")
+                    line = line.replace("\n", "")
                     l = line.split(' ')
                     first_name = l[0]
                     last_name = l[1]
@@ -378,7 +378,8 @@ class Amity:
         for room in all_rooms:
             if len(room.occupants) > 0:
                 for person in room.occupants:
-                    msg += str(person.first_name, person.last_name)
+                    msg += str(person.first_name) + ' ' + \
+                        person.last_name + '\n'
             else:
                 msg += "There are no occupants in the room"
         return msg
