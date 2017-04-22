@@ -206,12 +206,15 @@ class Amity:
                     if len(random_office.occupants) < random_office.capacity:
                         random_office.occupants.append(person)
                         self.office_waiting_list.remove(person)
-                        msg += "\nYou have been allocted to room {}\n".format(
-                            random_office.room_name)
+                        msg += "\n{} {} has been allocted to room {}\n".format(person.first_name, person.last_name,
+                                                                               random_office.room_name)
+                    else:
+                        msg += "\nNo offices available\n"
+
             else:
                 msg += "\nThere are no people in the waiting list\n"
         else:
-            msg += "\nNo office available\n"
+            msg += "\nNo offices available\n"
         return msg
 
     def allocate_livingspace_waiting_list(self):
@@ -229,8 +232,11 @@ class Amity:
                     if len(random_living_space.occupants) < random_living_space.capacity:
                         random_living_space.occupants.append(person)
                         self.living_space_waiting_list.remove(person)
-                        msg += "\nYou have been allocted to room {}\n".format(
-                            random_living_space.room_name)
+                        msg += "\n{} {} has been allocted to room {}\n".format(person.first_name, person.last_name,
+                                                                               random_living_space.room_name)
+                    else:
+                        msg += "\nNo livingspace available\n"
+
             else:
                 msg += "\nThere are no people in the waiting list\n"
         else:
@@ -302,17 +308,17 @@ class Amity:
          '''
         msg = ''
         if len(Amity.office_waiting_list) == 0 and len(Amity.living_space_waiting_list) == 0:
-            return "There are no unallocated people"
+            return "\nThere are no unallocated people\n"
         else:
             msg += "People not allocated to office \n"
-            msg += "---------------------------"
+            msg += "---------------------------\n"
             unallocated_office_space = '\n'.join(str(
-                person.person_id) + ' ' + person.first_name + ' ' + person.last_name for person in Amity.office_waiting_list)
+                person.person_id) + ' ' + person.first_name + ' ' + person.last_name + '\n' for person in Amity.office_waiting_list)
             msg += unallocated_office_space
-            msg += "People not allocated to living space \n"
-            msg += "---------------------------"
+            msg += "\nPeople not allocated to living space \n"
+            msg += "---------------------------\n"
             unallocated_living_space = '\n'.join(str(
-                person.person_id) + ' ' + person.first_name + ' ' + person.last_name for person in Amity.living_space_waiting_list)
+                person.person_id) + ' ' + person.first_name + ' ' + person.last_name + '\n' for person in Amity.living_space_waiting_list)
             msg += unallocated_living_space
             if filename:
                 file = open(filename, 'w')
