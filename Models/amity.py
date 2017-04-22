@@ -243,20 +243,23 @@ class Amity:
         return msg
 
     def load_people(self):
-        with open('amity.txt') as f:
-            lines = f.readlines()
-            print(lines)
-            msg = ''
-            for line in lines:
-                line.replace(r"\n", " ")
-                l = line.split(' ')
-                first_name = l[0]
-                last_name = l[1]
-                role = l[2]
-                accommodation = (l[3] if len(l) > 3 else "NO")
-                msg += self.add_person(role, first_name,
-                                       last_name, accommodation)
-            return msg
+        try:
+            with open('amity.txt') as f:
+                lines = f.readlines()
+                msg = ''
+                for line in lines:
+                    line.replace(r"\n", "")
+                    l = line.split(' ')
+                    first_name = l[0]
+                    last_name = l[1]
+                    role = l[2]
+                    accommodation = (l[3] if len(l) > 3 else "NO")
+                    print(accommodation)
+                    msg += self.add_person(role, first_name,
+                                           last_name, accommodation)
+                return msg
+        except:
+            return "File not provided"
 
     def print_available_rooms(self):
         '''
