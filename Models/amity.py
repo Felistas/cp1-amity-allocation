@@ -88,6 +88,9 @@ class Amity:
                         office_selected_random.occupants.append(fellow)
                         msg += '\nYou have been allocated to office ' + \
                             office_selected_random.room_name + '\n'
+                    else:
+                        self.office_waiting_list.append(fellow)
+                        msg += '\nYou have been added to office waiting list \n'
                 else:
                     self.office_waiting_list.append(fellow)
                     msg += '\nYou have been added to office waiting list \n'
@@ -100,25 +103,31 @@ class Amity:
                                 fellow)
                             msg += '\nYou have been allocated to living space ' + \
                                 living_space_selected_random.room_name + '\n'
+                        else:
+                            self.living_space_waiting_list.append(fellow)
+                            msg += '\nYou have been added to living space waiting list \n'
                     else:
                         self.living_space_waiting_list.append(fellow)
                         msg += '\nYou have been added to living space waiting list \n'
             elif role == 'STAFF':
                 if accommodation == 'YES' or accommodation == "Y":
                     msg += "\nStaff cannot get accommodation \n"
-                    staff = Staff(role, first_name, last_name,  accommodation)
-                    self.people.append(staff)
-                    msg += '\n{} {} {} successfully added\n'.format(
-                        staff.role, staff.first_name, staff.last_name)
-                    office_selected_random = self.allocate_room("office")
-                    if office_selected_random:
-                        if len(office_selected_random.occupants) < office_selected_random.capacity:
-                            office_selected_random.occupants.append(staff)
-                            msg += '\nYou have been allocated to office ' + \
-                                office_selected_random.room_name + '\n'
+                staff = Staff(role, first_name, last_name,  accommodation)
+                self.people.append(staff)
+                msg += '\n{} {} {} successfully added\n'.format(
+                    staff.role, staff.first_name, staff.last_name)
+                office_selected_random = self.allocate_room("office")
+                if office_selected_random:
+                    if len(office_selected_random.occupants) < office_selected_random.capacity:
+                        office_selected_random.occupants.append(staff)
+                        msg += '\nYou have been allocated to office ' + \
+                            office_selected_random.room_name + '\n'
                     else:
                         self.office_waiting_list.append(staff)
                         msg += '\nYou have been added to office waiting list \n'
+                else:
+                    self.office_waiting_list.append(staff)
+                    msg += '\nYou have been added to office waiting list \n'
         return msg
 
     def print_person_id(self, first_name, last_name):
