@@ -166,13 +166,77 @@ class ModelsTest(unittest.TestCase):
         allocate_office = self.amity.allocate_office_waiting_list()
         self.assertIn('No office available', allocate_office)
 
-    def test_cannot_allocate_office_waiting_list(self):
+    def test_allocate_office_waiting_list(self):
         """Assert alloated people in office list to an office"""
         self.amity.rooms['office'] = []
         self.amity.add_person("fellow", "ivan", "pycharm")
         self.amity.create_room("office", ["toll"])
         allocate = self.amity.allocate_office_waiting_list()
         self.assertIn('You have been allocted to room toll', allocate)
+
+    def test_cannot_allocate_people_in_living_space_waiting_list_if_no_living_space(self):
+        """Assert person in living space waiting list cannot be allocated to a room if there is no living space"""
+        self.amity.rooms['living_space'] = []
+        self.amity.add_person("fellow", "ivan", "pycharm")
+        allocate_living_space = self.amity.allocate_livingspace_waiting_list()
+        self.assertIn('No livingspace available', allocate_living_space)
+
+    def test_allocate_living_space_waiting_list(self):
+        """Assert allocate people in living space waiting list successfully"""
+        self.amity.rooms['living_space'] = []
+        self.amity.add_person("fellow", "ivan", "pycharm")
+        self.amity.create_room("livingspace", ["ruiru"])
+        allocate = self.amity.allocate_livingspace_waiting_list()
+        self.assertIn('You have been allocted to room ruiru', allocate)
+
+    def test_no_available_offices(self):
+        """Assert message where there are no rooms"""
+        Amity.rooms = {'living_space': [], 'office': []}
+        msg = self.amity.print_available_rooms()
+        self.assertIn("No offices available", msg)
+        self.assertIn("No living spaces available", msg)
+
+    def test_no_occupants(self):
+        """Assert message where there are no occupants in the room"""
+        self.amity.create_room("office", ["toll"])
+        no_occupants = self.amity.print_allocations()
+        self.assertIn("There are no allocations", no_occupants)
+
+    def test_assert_successfully_saved_to_text_file(self):
+        """Assert successfully saved to text file"""
+        self.amity.create_room("livingspace", ["ruiru"])
+        self.amity.add_person("fellow", "ivan", "pycharm", "Y")
+        room = self.amity.print_allocations("filename")
+        self.assertIn("Successfully saved to filename", room)
+
+    def test_no_unallocated_people(self):
+        """Assert message that there are no unallocated people"""
+        Amity.office_waiting_list = []
+        Amity.living_space_waiting_list = []
+        unallocated = self.amity.print_unallocated()
+        self.assertIn("There are no unallocated people", unallocated)
+
+    def test_print_unallocated_to_office(self):
+        """Assert that people without offices are successfully printed"""
+        Amity.office_waiting_list = []
+        self.amity.add_person("fellow", "ivan", "pycharm")
+        unallocated = self.amity.print_unallocated()
+        self.assertIn("People not allocated to office", unallocated)
+
+    def test_print_unallocated_to_living_space(self):
+        """Assert that people without living space are successfully printed"""
+        Amity.living_space_waiting_list = []
+        self.amity.add_person("fellow", "ivan", "pycharm", "Y")
+        unallocated = self.amity.print_unallocated()
+        self.assertIn("People not allocated to living space", unallocated)
+
+    def test_successfully_unallocated_saved_to_text_file(self):
+        """Assert message successfully saved to filename"""
+        self.amity.living_space_waiting_list = []
+        self.amity.office_waiting_list = []
+        self.amity.add_person("fellow", "ivan", "pycharm", "Y")
+        room = self.amity.print_unallocated("filename")
+        self.assertIn("Successfully saved to filename", room)
 
     def test_save_test(self):
         """Asserts that state is not saved if not provided database name"""
