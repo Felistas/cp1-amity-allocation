@@ -190,7 +190,8 @@ class Amity:
                     room.occupants.remove(person)
             new_room.occupants.append(person)
             return '\nSuccessfully reallocated to {}\n'.format(new_room.room_name)
-        return '\n{} does not exist\n'.format(room_name)
+        else:
+            return '\n{} does not exist\n'.format(room_name)
 
     def allocate_office_waiting_list(self):
         '''
@@ -237,7 +238,6 @@ class Amity:
                                                                                random_living_space.room_name)
                     else:
                         msg += "\nNo livingspace available\n"
-
             else:
                 msg += "\nThere are no people in the waiting list\n"
         else:
@@ -262,16 +262,24 @@ class Amity:
         offices = self.rooms['office']
         for office in offices:
             if len(office.occupants) < office.capacity:
+                msg1 += "Offices"
+                msg1 += "\n--------------------------- \n"
                 msg1 += office.room_name
+            else:
+                msg1 += "\nNo offices available\n"
         if msg1 == '':
-            msg1 += "No offices available"
+            msg1 += "\nNo offices available\n"
         msg2 = ''
         living_spaces = self.rooms['living_space']
         for living_space in living_spaces:
             if len(living_space.occupants) < living_space.capacity:
+                msg2 += "\nLiving Spaces"
+                msg2 += "\n--------------------------- \n"
                 msg2 += living_space.room_name
+            else:
+                msg2 += "\nNo living spaces available\n"
         if msg2 == '':
-            msg2 += "No living spaces available"
+            msg2 += "\nNo living spaces available\n"
         return msg1 + msg2
 
     def print_allocations(self, filename=None):
