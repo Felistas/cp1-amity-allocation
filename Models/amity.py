@@ -294,7 +294,7 @@ class Amity:
             for room in all_rooms:
                 if len(room.occupants) > 0:
                     msg += room.room_name
-                    msg += "\n --------------------------- \n"
+                    msg += "\n--------------------------- \n"
                     for person in room.occupants:
                         msg += (person.first_name + " " +
                                 person.last_name + ",")
@@ -304,10 +304,10 @@ class Amity:
                 file = open(filename, 'w')
                 file.write(msg)
                 file.close()
-                msg += '\n Successfully saved to ' + filename
+                msg += '\nSuccessfully saved to ' + filename + ' textfile'
             return msg
         else:
-            return "No rooms available"
+            return "No rooms available for allocations"
 
     def print_unallocated(self, filename=None):
         '''Check if there are people added in the office waiting list
@@ -347,18 +347,18 @@ class Amity:
         if len(offices) > 0:
             for office in offices:
                 msg += "OFFICES"
-                msg += "---------------------------"
+                msg += "\n---------------------------\n"
                 msg += office.room_name
         else:
-            msg += "There are no offices"
+            msg += "There are no offices\n"
         living_spaces = list(self.rooms['living_space'])
         if len(living_spaces) > 0:
             for living_space in living_spaces:
-                msg += "LIVING SPACES"
-                msg += "---------------------------"
+                msg += "\nLIVING SPACES"
+                msg += "\n---------------------------\n"
                 msg += living_space.room_name
         else:
-            msg += "There are no livingspaces"
+            msg += "\nThere are no livingspaces"
         return msg
 
     def print_room(self):
@@ -366,8 +366,11 @@ class Amity:
         msg = ''
         all_rooms = self.rooms["office"] + self.rooms["living_space"]
         for room in all_rooms:
-            for person in room.occupants:
-                msg += person.first_name, person.last_name
+            if len(room.occupants) > 0:
+                for person in room.occupants:
+                    msg += person.first_name, person.last_name
+            else:
+                msg += "There are no occupants in the room"
         return msg
 
     def save_state(self, dbname):
