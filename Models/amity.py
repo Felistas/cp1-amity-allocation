@@ -154,6 +154,7 @@ class Amity:
         Append person to the new room
         Check person should not be reallocated to the same room
         '''
+        room_name = room_name.upper()
         msg = ''
         person = [person for person in self.people if int(person_id) ==
                   person.person_id]
