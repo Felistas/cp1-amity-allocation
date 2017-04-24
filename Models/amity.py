@@ -20,20 +20,20 @@ class Amity:
         Creates living space
         '''
         msg = ''
-        room_type = room_type.upper()
+        room_type = room_type.title()
         for room_name in room_names:
-            room_name = room_name.upper()
+            room_name = room_name.title()
             all_rooms = self.rooms['office'] + self.rooms['living_space']
             check_room = [
                 room.room_name for room in all_rooms if room.room_name == room_name]
             if check_room:
                 msg += '\n{} already exists\n'.format(room_name)
             else:
-                if room_type == 'OFFICE':
+                if room_type == 'Office':
                     room = Office(room_name)
                     self.rooms['office'].append(room)
                     msg += '\nSuccessfully created Office ' + room.room_name + '\n'
-                elif room_type == 'LIVINGSPACE':
+                elif room_type == 'Livingspace':
                     room = LivingSpace(room_name)
                     self.rooms['living_space'].append(room)
                     msg += '\nSuccessfully created Living Space ' + room.room_name + '\n'
@@ -45,12 +45,12 @@ class Amity:
         Selects a living space at random
         Checks that room type should be either livingspace or office
         '''
-        room_type = room_type.upper()
-        if room_type == "OFFICE":
+        room_type = room_type.title()
+        if room_type == "Office":
             offices = self.rooms['office']
             if len(offices):
                 return random.choice(self.rooms['office'])
-        elif room_type == 'LIVINGSPACE':
+        elif room_type == 'Livingspace':
             living_spaces = self.rooms['living_space']
             if len(living_spaces):
                 return random.choice(self.rooms['living_space'])
@@ -70,12 +70,12 @@ class Amity:
         if first_name.isalpha() is False and last_name.isalpha() is False and role.isalpha():
             msg += "\nInvalid input\n"
         else:
-            role = role.upper()
-            first_name = first_name.upper()
-            last_name = last_name.upper()
-            accommodation = (accommodation.upper()
+            role = role.title()
+            first_name = first_name.title()
+            last_name = last_name.title()
+            accommodation = (accommodation.title()
                              if accommodation is not None else "NO")
-            if role == 'FELLOW':
+            if role == 'Fellow':
                 fellow = Fellow(role, first_name, last_name, accommodation)
                 self.people.append(fellow)
                 msg += ('\n' + fellow.role + ' ' + fellow.first_name + ' ' +
@@ -92,7 +92,7 @@ class Amity:
                 else:
                     self.office_waiting_list.append(fellow)
                     msg += '\nYou have been added to office waiting list \n'
-                if accommodation == 'YES' or accommodation == 'Y':
+                if accommodation == 'Yes' or accommodation == 'Y':
                     living_space_selected_random = self.allocate_room(
                         "livingspace")
                     if living_space_selected_random:
@@ -107,8 +107,8 @@ class Amity:
                     else:
                         self.living_space_waiting_list.append(fellow)
                         msg += '\nYou have been added to living space waiting list \n'
-            elif role == 'STAFF':
-                if accommodation == 'YES' or accommodation == "Y":
+            elif role == 'Staff':
+                if accommodation == 'Yes' or accommodation == "Y":
                     msg += "\nStaff cannot get accommodation \n"
                 staff = Staff(role, first_name, last_name,  accommodation)
                 self.people.append(staff)
@@ -131,8 +131,8 @@ class Amity:
     def print_person_id(self, first_name, last_name):
         """ Print the person id given the person first and last name"""
         msg = ''
-        first_name = first_name.upper()
-        last_name = last_name.upper()
+        first_name = first_name.title()
+        last_name = last_name.title()
         ids = [person for person in self.people if first_name ==
                person.first_name and last_name == person.last_name]
         if len(ids) > 0:
@@ -154,7 +154,7 @@ class Amity:
         Append person to the new room
         Check person should not be reallocated to the same room
         '''
-        room_name = room_name.upper()
+        room_name = room_name.title()
         msg = ''
         person = [person for person in self.people if int(person_id) ==
                   person.person_id]
@@ -174,8 +174,8 @@ class Amity:
             return '\n{} had not been allocated a room\n'.format(person.first_name)
         if new_room is not None:
             room_type = type(new_room)
-            role = person.role.upper()
-            if role == 'STAFF' and room_type == LivingSpace:
+            role = person.role.title()
+            if role == 'Staff' and room_type == LivingSpace:
                 return '\nCannot reallocate staff to livingspace\n'
             if not type(new_room) in [type(room) for room in previous_rooms]:
                 return '\nCannot reallocate from one room type to another\n'
@@ -253,8 +253,7 @@ class Amity:
                     first_name = l[0]
                     last_name = l[1]
                     role = l[2]
-                    accommodation = (l[3] if len(l) > 3 else "NO")
-                    print(accommodation)
+                    accommodation = (l[3] if len(l) > 3 else "No")
                     msg += self.add_person(role, first_name,
                                            last_name, accommodation)
                 return msg
@@ -415,7 +414,7 @@ class Amity:
             conn.close()
             return 'Data successfully exported to the Database'
         except:
-            return 'Save state was Unsuccessfull'
+            return 'Save state was unsuccessfull.Provide '
 
     def load_state(self, dbname):
         """
