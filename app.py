@@ -7,7 +7,7 @@ Usage:
     Amity create_room (office|livingspace) <room_name>
     Amity add_person (fellow|staff) <first_name> <last_name> [<accommodation>]
     Amity reallocate_person <person_id> <room_name>
-    Amity load_people
+    Amity load_people <filename>
     Amity print_allocations [-o=filename]
     Amity print_unallocated [-o=filename]
     Amity print_available_rooms
@@ -95,8 +95,9 @@ class Amityapp(cmd.Cmd):
 
     @docopt_cmd
     def do_load_people(self, arg):
-        """Usage: load_people"""
-        print(self.amity.load_people())
+        """Usage: load_people <filename>"""
+        filename = arg['<filename>']
+        print(self.amity.load_people(filename))
 
     @docopt_cmd
     def do_print_allocations(self, arg):

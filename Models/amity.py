@@ -242,11 +242,11 @@ class Amity:
             msg += "\nNo livingspace available\n"
         return msg
 
-    def load_people(self):
+    def load_people(self, filename):
+        msg = ''
         try:
-            with open('amity.txt') as f:
+            with open(filename + '.txt') as f:
                 lines = f.readlines()
-                msg = ''
                 for line in lines:
                     line = line.replace("\n", "")
                     l = line.split(' ')
@@ -256,9 +256,9 @@ class Amity:
                     accommodation = (l[3] if len(l) > 3 else "No")
                     msg += self.add_person(role, first_name,
                                            last_name, accommodation)
-                return msg
         except:
-            return "File not provided"
+            msg += 'File does not exist'
+        return msg
 
     def print_available_rooms(self):
         '''
@@ -383,38 +383,48 @@ class Amity:
                 msg += "There are no occupants in the room"
         return msg
 
-    def save_state(self, dbname):
+    def save_state(self, dbname="amity.db"):
         """
         Creates table called allocated
         Saves all rooms created and occupants of the rooms to the table
         Creates table unallocated
         Saves all objects in office waiting list and living space waiting list to the table
         """
-        try:
-            conn = sqlite3.connect(dbname)
-            curs = conn.cursor()
-            curs.execute("""CREATE TABLE IF NOT EXISTS allocated (aID INTEGER PRIMARY KEY UNIQUE,
-                         rooms TEXT, occupants TEXT)""")
-            all_rooms = self.rooms["office"] + self.rooms["living_space"]
-            for room in all_rooms:
-                for person in room.occupants:
-                    person = person.first_name
-                    curs.execute(
-                        "INSERT INTO allocated (rooms, occupants) VALUES (?, ?)", (room.room_name, person))
-            curs.execute("""CREATE TABLE IF NOT EXISTS unallocated
-                         (aID INTEGER PRIMARY KEY UNIQUE,
-                         office_waiting_list TEXT, living_space_waiting_list TEXT)""")
-            for person in self.living_space_waiting_list:
+
+        conn = sqlite3.connect(dbname)
+        curs = conn.cursor()
+        curs.execute("""CREATE TABLE IF NOT EXISTS allocated (aID INTEGER PRIMARY KEY UNIQUE,
+                     rooms TEXT, occupants TEXT)""")
+        all_rooms = self.rooms["office"] + self.rooms["living_space"]
+        for room in all_rooms:
+            for person in room.occupants:
                 person = person.first_name
-            for person in self.office_waiting_list:
-                person = person.first_name
-            curs.execute("INSERT INTO unallocated (office_waiting_list,living_space_waiting_list) VALUES (?, ?)",
-                         (person, person))
-            conn.commit()
-            conn.close()
-            return 'Data successfully exported to the Database'
-        except:
-            return 'Save state was unsuccessfull.Provide '
+                curs.execute(
+                    "INSERT INTO allocated (rooms, occupants) VALUES (?, ?)", (room.room_name, person))
+        curs.execute("""CREATE TABLE IF NOT EXISTS unallocated
+                     (aID INTEGER PRIMARY KEY UNIQUE,
+                     office_waiting_list TEXT, living_space_waiting_list TEXT)""")
+        for person in self.living_space_waiting_list:
+            person = person.first_name
+        for person in self.office_waiting_list:
+            person = person.first_name
+        curs.execute("INSERT INTO unallocated (office_waiting_list,living_space_waiting_list) VALUES (?, ?)",
+                     (person, person))
+        curs.execute(
+            """CREATE TABLE IF NOT EXISTS people (pID INTEGER PRIMARY KEY UNIQUE, staff TEXT, fellow TEXT)""")
+        for person in self.people:
+            person = person.first_name, person.last_name
+            curs.execute("INSERT INTO people (staff,fellow) VALUES (?,?)",
+                         (person.first_name, person.last_name))
+        curs.execute(
+            """CREATE TABLE IF NOT EXISTS rooms (pID INTEGER PRIMARY KEY UNIQUE, office TEXT, living_space TEXT)""")
+        for office in self.rooms['office']:
+            office = office.room_name
+        for livingspace in self.rooms['living_space']:
+            livingspace = livingspace.room_name
+        conn.commit()
+        conn.close()
+        return 'Data successfully exported to the Database'
 
     def load_state(self, dbname):
         """
