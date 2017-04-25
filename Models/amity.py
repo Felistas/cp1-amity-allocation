@@ -393,33 +393,31 @@ class Amity:
         dbname = dbname if dbname else "amity.db"
         conn = sqlite3.connect(dbname)
         curs = conn.cursor()
-        # curs.execute("""CREATE TABLE IF NOT EXISTS allocated (aID INTEGER PRIMARY KEY UNIQUE,
-        #              rooms TEXT, occupants TEXT)""")
-        # all_rooms = self.rooms["office"] + self.rooms["living_space"]
-        # for room in all_rooms:
-        #     for person in room.occupants:
-        #         person = person.first_name
-        #         curs.execute(
-        #             "INSERT INTO allocated (rooms, occupants) VALUES (?, ?)", (room.room_name, person))
-        # curs.execute("""CREATE TABLE IF NOT EXISTS unallocated
-        #              (aID INTEGER PRIMARY KEY UNIQUE,
-        #              office_waiting_list TEXT, living_space_waiting_list TEXT)""")
-        # for person in self.living_space_waiting_list:
-        #     person = person.first_name
-        # for person in self.office_waiting_list:
-        #     person = person.first_name
-        # curs.execute("INSERT INTO unallocated (office_waiting_list,living_space_waiting_list) VALUES (?, ?)",
-        #              (person, person))
+        curs.execute("""DROP TABLE IF EXISTS unallocated""")
+        curs.execute("""CREATE TABLE unallocated
+                     (aID INTEGER PRIMARY KEY UNIQUE,
+                     office_waiting_list TEXT, living_space_waiting_list TEXT)""")
+        person = ''
+        for person in self.living_space_waiting_list:
+            person = person.first_name + ' ' + person.last_name
+            curs.execute("INSERT INTO unallocated (office_waiting_list) VALUES (?)",
+                         [person])
+        for person in self.office_waiting_list:
+            person = person.first_name + ' ' + person.last_name
+            curs.execute("INSERT INTO unallocated (living_space_waiting_list) VALUES (?)",
+                         [person])
+        curs.execute("""DROP TABLE IF EXISTS people""")
         curs.execute(
-            """CREATE TABLE IF NOT EXISTS people (pID INTEGER PRIMARY KEY UNIQUE, name TEXT, role TEXT, accommodation TEXT)""")
+            """CREATE TABLE people (pID INTEGER PRIMARY KEY UNIQUE, name TEXT, role TEXT, accommodation TEXT)""")
         for person in self.people:
-            name = person.first_name + ' ' + person.last_name
+            name = person.first_name + ' ' + person.last_name + ','
             role = person.role
             accommodation = person.accommodation
             curs.execute("INSERT INTO people (name,role,accommodation) VALUES (?,?,?)",
                          (name, role, accommodation))
+        curs.execute("""DROP TABLE IF EXISTS rooms""")
         curs.execute(
-            """CREATE TABLE IF NOT EXISTS rooms (pID INTEGER PRIMARY KEY UNIQUE, name TEXT, type TEXT, occupants TEXT)""")
+            """CREATE TABLE rooms (pID INTEGER PRIMARY KEY UNIQUE, name TEXT, type TEXT, occupants TEXT)""")
         office_occupants = ''
         for office in self.rooms['office']:
             office_name = office.room_name
