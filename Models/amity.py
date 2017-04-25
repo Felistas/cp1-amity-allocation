@@ -390,38 +390,52 @@ class Amity:
         Creates table unallocated
         Saves all objects in office waiting list and living space waiting list to the table
         """
-
+        dbname = dbname if dbname else "amity.db"
         conn = sqlite3.connect(dbname)
         curs = conn.cursor()
-        curs.execute("""CREATE TABLE IF NOT EXISTS allocated (aID INTEGER PRIMARY KEY UNIQUE,
-                     rooms TEXT, occupants TEXT)""")
-        all_rooms = self.rooms["office"] + self.rooms["living_space"]
-        for room in all_rooms:
-            for person in room.occupants:
-                person = person.first_name
-                curs.execute(
-                    "INSERT INTO allocated (rooms, occupants) VALUES (?, ?)", (room.room_name, person))
-        curs.execute("""CREATE TABLE IF NOT EXISTS unallocated
-                     (aID INTEGER PRIMARY KEY UNIQUE,
-                     office_waiting_list TEXT, living_space_waiting_list TEXT)""")
-        for person in self.living_space_waiting_list:
-            person = person.first_name
-        for person in self.office_waiting_list:
-            person = person.first_name
-        curs.execute("INSERT INTO unallocated (office_waiting_list,living_space_waiting_list) VALUES (?, ?)",
-                     (person, person))
+        # curs.execute("""CREATE TABLE IF NOT EXISTS allocated (aID INTEGER PRIMARY KEY UNIQUE,
+        #              rooms TEXT, occupants TEXT)""")
+        # all_rooms = self.rooms["office"] + self.rooms["living_space"]
+        # for room in all_rooms:
+        #     for person in room.occupants:
+        #         person = person.first_name
+        #         curs.execute(
+        #             "INSERT INTO allocated (rooms, occupants) VALUES (?, ?)", (room.room_name, person))
+        # curs.execute("""CREATE TABLE IF NOT EXISTS unallocated
+        #              (aID INTEGER PRIMARY KEY UNIQUE,
+        #              office_waiting_list TEXT, living_space_waiting_list TEXT)""")
+        # for person in self.living_space_waiting_list:
+        #     person = person.first_name
+        # for person in self.office_waiting_list:
+        #     person = person.first_name
+        # curs.execute("INSERT INTO unallocated (office_waiting_list,living_space_waiting_list) VALUES (?, ?)",
+        #              (person, person))
         curs.execute(
-            """CREATE TABLE IF NOT EXISTS people (pID INTEGER PRIMARY KEY UNIQUE, staff TEXT, fellow TEXT)""")
+            """CREATE TABLE IF NOT EXISTS people (pID INTEGER PRIMARY KEY UNIQUE, name TEXT, role TEXT, accommodation TEXT)""")
         for person in self.people:
-            person = person.first_name, person.last_name
-            curs.execute("INSERT INTO people (staff,fellow) VALUES (?,?)",
-                         (person.first_name, person.last_name))
+            name = person.first_name + ' ' + person.last_name
+            role = person.role
+            accommodation = person.accommodation
+            curs.execute("INSERT INTO people (name,role,accommodation) VALUES (?,?,?)",
+                         (name, role, accommodation))
         curs.execute(
-            """CREATE TABLE IF NOT EXISTS rooms (pID INTEGER PRIMARY KEY UNIQUE, office TEXT, living_space TEXT)""")
+            """CREATE TABLE IF NOT EXISTS rooms (pID INTEGER PRIMARY KEY UNIQUE, name TEXT, type TEXT, occupants TEXT)""")
+        office_occupants = ''
         for office in self.rooms['office']:
-            office = office.room_name
+            office_name = office.room_name
+            office_type = "office"
+            for person in office.occupants:
+                office_occupants += person.first_name + ' ' + person.last_name + ','
+            curs.execute(
+                "INSERT INTO rooms (name,type,occupants) VALUES (?,?,?)", (office_name, office_type, office_occupants))
+        livingspace_occupants = ''
         for livingspace in self.rooms['living_space']:
-            livingspace = livingspace.room_name
+            livingspace_name = livingspace.room_name
+            livingspace_type = 'living_space'
+            for person in livingspace.occupants:
+                livingspace_occupants += person.first_name + ' ' + person.last_name + ','
+            curs.execute(
+                "INSERT INTO rooms (name,type,occupants) VALUES (?,?,?)", (livingspace_name, livingspace_type, livingspace_occupants))
         conn.commit()
         conn.close()
         return 'Data successfully exported to the Database'
