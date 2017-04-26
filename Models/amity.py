@@ -307,6 +307,7 @@ class Amity:
                     for person in room.occupants:
                         msg += (person.first_name + " " +
                                 person.last_name + ",")
+                    msg += '\n\n'
             if msg == '':
                 return 'There are no allocations'
             if filename:
@@ -396,25 +397,26 @@ class Amity:
         curs.execute("""DROP TABLE IF EXISTS unallocated""")
         curs.execute("""CREATE TABLE unallocated
                      (aID INTEGER PRIMARY KEY UNIQUE,
-                     office_waiting_list TEXT, living_space_waiting_list TEXT)""")
+                     office_waiting_list INTEGER, living_space_waiting_list INTEGER)""")
         person = ''
-        for person in self.living_space_waiting_list:
-            person = person.first_name + ' ' + person.last_name
-            curs.execute("INSERT INTO unallocated (office_waiting_list) VALUES (?)",
-                         [person])
         for person in self.office_waiting_list:
-            person = person.first_name + ' ' + person.last_name
-            curs.execute("INSERT INTO unallocated (living_space_waiting_list) VALUES (?)",
-                         [person])
+            person = person.person_id
+            curs.execute("INSERT INTO unallocated (office_waiting_list,living_space_waiting_list) VALUES (?,?)",
+                         (person, 0))
+        for person in self.living_space_waiting_list:
+            person = person.person_id
+            curs.execute("INSERT INTO unallocated (office_waiting_list,living_space_waiting_list) VALUES (?,?)",
+                         (0, person))
         curs.execute("""DROP TABLE IF EXISTS people""")
         curs.execute(
-            """CREATE TABLE people (pID INTEGER PRIMARY KEY UNIQUE, name TEXT, role TEXT, accommodation TEXT)""")
+            """CREATE TABLE people (person_id INTEGER PRIMARY KEY UNIQUE,name TEXT, role TEXT, accommodation TEXT)""")
         for person in self.people:
-            name = person.first_name + ' ' + person.last_name + ','
+            person_id = person.person_id
+            name = person.first_name + ' ' + person.last_name
             role = person.role
             accommodation = person.accommodation
-            curs.execute("INSERT INTO people (name,role,accommodation) VALUES (?,?,?)",
-                         (name, role, accommodation))
+            curs.execute("INSERT INTO people (person_id,name,role,accommodation) VALUES (?,?,?,?)",
+                         (person_id, name, role, accommodation))
         curs.execute("""DROP TABLE IF EXISTS rooms""")
         curs.execute(
             """CREATE TABLE rooms (pID INTEGER PRIMARY KEY UNIQUE, name TEXT, type TEXT, occupants TEXT)""")
@@ -423,7 +425,7 @@ class Amity:
             office_name = office.room_name
             office_type = "office"
             for person in office.occupants:
-                office_occupants += person.first_name + ' ' + person.last_name + ','
+                office_occupants += str(person.person_id) + ' '
             curs.execute(
                 "INSERT INTO rooms (name,type,occupants) VALUES (?,?,?)", (office_name, office_type, office_occupants))
         livingspace_occupants = ''
@@ -431,35 +433,72 @@ class Amity:
             livingspace_name = livingspace.room_name
             livingspace_type = 'living_space'
             for person in livingspace.occupants:
-                livingspace_occupants += person.first_name + ' ' + person.last_name + ','
+                livingspace_occupants += str(person.person_id) + ' '
             curs.execute(
                 "INSERT INTO rooms (name,type,occupants) VALUES (?,?,?)", (livingspace_name, livingspace_type, livingspace_occupants))
         conn.commit()
         conn.close()
         return 'Data successfully exported to the Database'
 
-    def load_state(self, dbname):
+    def load_state(self, dbname="amity.db"):
         """
         Fetches all data in allocated table in prints it on the screen
         Fetches all data in the unallocated table and prints it on the screen
         """
-        try:
-            msg = ''
-            conn = sqlite3.connect(dbname)
-            curs = conn.cursor()
-            curs.execute(
-                "SELECT * FROM allocated WHERE aID = (SELECT MAX(aID) FROM allocated)")
-            allocated = curs.fetchone()
-            for row in allocated:
-                print(row)
-            curs.close()
-            conn.close()
-            curs.execute(
-                "SELECT * FROM unallocated WHERE aID = (SELECT MAX(aID) FROM unallocated)")
-            data = conn.fetchone()
-            for row in unallocated:
-                print(row[1], row[2])
-            msg += 'Successfully loaded data from the Database'
-        except:
-            msg += "Provide database name"
+        dbname = dbname if dbname else "amity.db"
+        msg = ''
+        conn = sqlite3.connect(dbname)
+        curs = conn.cursor()
+        curs.execute("SELECT * FROM people")
+        people = curs.fetchall()
+        self.people = []
+        for person in people:
+            if person[2] == 'Staff':
+                staff = Staff(person[2], person[1].split(
+                    ' ')[0], person[1].split(' ')[1], person[3])
+                staff.id = person[0]
+                self.people.append(staff)
+
+            else:
+                fellow = Fellow(person[2], person[1].split(
+                    ' ')[0], person[1].split(' ')[1], person[3])
+                fellow.id = person[0]
+                self.people.append(fellow)
+
+        curs.execute("SELECT * FROM rooms")
+        rooms = curs.fetchall()
+        for room in rooms:
+            if room[2] == 'living_space':
+                livingspace = LivingSpace(room[1])
+                livingspace_occupants = []
+                for occupant in room[3][:-1].split(' '):
+                    for person in self.people:
+                        if person.id == int(occupant):
+                            livingspace_occupants.append(person)
+                livingspace.occupants = livingspace_occupants
+                self.rooms['living_space'].append(livingspace)
+            if room[2] == 'office':
+                office = Office(room[1])
+                office_occupants = []
+                for occupant in room[3][:-1].split(' '):
+                    for person in self.people:
+                        if person.id == int(occupant):
+                            office_occupants.append(person)
+                office.occupants = office_occupants
+                self.rooms['office'].append(office)
+        curs.execute("SELECT * FROM unallocated")
+        data = curs.fetchall()
+        for ids in data:
+            person = None
+            for persons in self.people:
+                person = None
+                if ids[1] == persons.id or ids[2] == persons.id:
+                    person = persons
+                    if ids[1] > 0 and person is not None:
+                        self.office_waiting_list.append(person)
+                    if ids[2] > 0 and person is not None:
+                        self.living_space_waiting_list.append(person)
+                    break
+                    conn.close()
+        msg += 'Successfully loaded data from the Database'
         return msg

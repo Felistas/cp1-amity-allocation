@@ -6,11 +6,12 @@ class Person(object):
         self.last_name = last_name
         self.accommodation = accommodation
 
-class Fellow(Person):
 
+class Fellow(Person):
 
     def __init__(self, role, first_name, last_name, accommodation):
         super(Fellow, self).__init__(role, first_name, last_name, accommodation)
+
 
 class Staff(Person):
 
