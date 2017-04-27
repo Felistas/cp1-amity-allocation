@@ -1,5 +1,4 @@
 import random
-import pickle
 import sqlite3
 from tabulate import tabulate
 from Models.person import Fellow, Staff
@@ -258,7 +257,7 @@ class Amity:
                 livingspaces = self.rooms['living_space']
                 if room in livingspaces:
                     for occupant in room.occupants:
-                        self.living_space_waiting_list(occupant)
+                        self.living_space_waiting_list.append(occupant)
                     self.rooms['living_space'].remove(room)
                     msg += 'Successfully deleted room {}'.format(
                         room.room_name)
@@ -266,7 +265,15 @@ class Amity:
                 msg += 'Room {} does not exist'.format(room.room_name)
         return msg
 
-        pass
+    def list_all_people(self):
+        """Lists all people in the system"""
+        msg = ''
+        for person in self.people:
+            msg += "People\n"
+            msg += "-----------------------------------------\n"
+            msg += str(person.person_id) + ' ' + \
+                person.first_name + ' ' + person.last_name
+        return msg
 
     def load_people(self, filename):
         msg = ''
@@ -415,10 +422,9 @@ class Amity:
 
     def save_state(self, dbname="amity.db"):
         """
-        Creates table called allocated
-        Saves all rooms created and occupants of the rooms to the table
-        Creates table unallocated
-        Saves all objects in office waiting list and living space waiting list to the table
+        Creates table called unallocated and saves the ids of unallocated people in office and livingspace waiting list
+        Creates a table called rooms that saves all rooms created and occupants id of the rooms
+        Creates table people which stores the ids of the people added to the system
         """
         dbname = dbname if dbname else "amity.db"
         conn = sqlite3.connect(dbname)
@@ -451,14 +457,15 @@ class Amity:
             """CREATE TABLE rooms (pID INTEGER PRIMARY KEY UNIQUE, name TEXT, type TEXT, occupants TEXT)""")
         office_occupants = ''
         for office in self.rooms['office']:
+            office_occupants = ''
             office_name = office.room_name
             office_type = "office"
             for person in office.occupants:
                 office_occupants += str(person.person_id) + ' '
             curs.execute(
                 "INSERT INTO rooms (name,type,occupants) VALUES (?,?,?)", (office_name, office_type, office_occupants))
-        livingspace_occupants = ''
         for livingspace in self.rooms['living_space']:
+            livingspace_occupants = ''
             livingspace_name = livingspace.room_name
             livingspace_type = 'living_space'
             for person in livingspace.occupants:
@@ -471,8 +478,9 @@ class Amity:
 
     def load_state(self, dbname="amity.db"):
         """
-        Fetches all data in allocated table in prints it on the screen
-        Fetches all data in the unallocated table and prints it on the screen
+        Fetches all data in unallocated table
+        Fetches all data in the people table
+        Fetches all data in the rooms table
         """
         dbname = dbname if dbname else "amity.db"
         msg = ''
@@ -482,12 +490,12 @@ class Amity:
         people = curs.fetchall()
         self.people = []
         for person in people:
+            print(person)
             if person[2] == 'Staff':
                 staff = Staff(person[2], person[1].split(
                     ' ')[0], person[1].split(' ')[1], person[3])
                 staff.id = person[0]
                 self.people.append(staff)
-
             else:
                 fellow = Fellow(person[2], person[1].split(
                     ' ')[0], person[1].split(' ')[1], person[3])

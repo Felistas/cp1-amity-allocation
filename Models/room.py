@@ -1,4 +1,5 @@
 class Room(object):
+    """Creates the super class Room that defines the common attributes for the other classes"""
 
     def __init__(self, room_name):
         self.room_id = id(self)
@@ -7,6 +8,7 @@ class Room(object):
 
 
 class LivingSpace(Room):
+    """Creates class LivingSpace that overides the Room class"""
     capacity = 4
 
     def __init__(self, room_name):
@@ -14,6 +16,7 @@ class LivingSpace(Room):
 
 
 class Office(Room):
+    """Creates class Office that overides the Room class"""
     capacity = 6
 
     def __init__(self, room_name):
