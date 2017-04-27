@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 """
-This example uses docopt with the built in cmd module to demonstrate an
-interactive command application.
+This is a room allocation system using CLI.
 
 Usage:
     Amity create_room (office|livingspace) <room_name>
@@ -29,8 +28,14 @@ Options:
 
 import sys
 import cmd
+import os
+from colorama import init
+from termcolor import cprint, colored
+from pyfiglet import Figlet
 from docopt import docopt, DocoptExit
 from Models.amity import Amity
+
+init()
 
 
 def docopt_cmd(func):
@@ -61,9 +66,13 @@ def docopt_cmd(func):
 
 
 class Amityapp(cmd.Cmd):
-    intro = 'Welcome to Amity room allocations!' \
-            + ' (type help for a list of commands.)'
-    prompt = 'Enter command>> '
+    font = Figlet(font='isometric3')
+    introduction = font.renderText('AMITY')
+    os.system('cls')
+    cprint(introduction, "blue", attrs=['blink'])
+    intro = colored('Welcome to Amity room allocations!'
+                    + ' (type help for a list of commands.)', "blue")
+    prompt = colored('Enter command>> ', 'blue')
     file = None
     amity = Amity()
 
@@ -75,7 +84,7 @@ class Amityapp(cmd.Cmd):
             room_type = "office"
         elif arg["livingspace"]:
             room_type = "livingspace"
-        print(self.amity.create_room(room_type, arg['<room_name>']))
+        cprint(self.amity.create_room(room_type, arg['<room_name>']), "blue")
 
     @docopt_cmd
     def do_add_person(self, arg):
@@ -85,93 +94,93 @@ class Amityapp(cmd.Cmd):
             role = "fellow"
         elif arg["staff"]:
             role = "staff"
-        print(self.amity.add_person(
-            role, arg['<first_name>'], arg['<last_name>'], arg['<accommodation>']))
+        cprint(self.amity.add_person(
+            role, arg['<first_name>'], arg['<last_name>'], arg['<accommodation>']), "blue")
 
     @docopt_cmd
     def do_reallocate_person(self, arg):
         """Usage: reallocate_person <person_id> <room_name>"""
-        print(self.amity.reallocate_person(
-            arg['<person_id>'], arg['<room_name>']))
+        cprint(self.amity.reallocate_person(
+            arg['<person_id>'], arg['<room_name>']), "blue")
 
     @docopt_cmd
     def do_delete_room(self, arg):
         """Usage: delete_person <room_name>"""
-        print(self.amity.delete_room(arg['<room_name>']))
+        cprint(self.amity.delete_room(arg['<room_name>']), "blue")
 
     @docopt_cmd
     def do_load_people(self, arg):
         """Usage: load_people <filename>"""
         filename = arg['<filename>']
-        print(self.amity.load_people(filename))
+        cprint(self.amity.load_people(filename), "blue")
 
     @docopt_cmd
     def do_print_allocations(self, arg):
         """Usage: print_allocations [--o=filename]"""
         filename = arg['--o']
-        print(self.amity.print_allocations(arg['--o']))
+        cprint(self.amity.print_allocations(arg['--o']), "blue")
 
     @docopt_cmd
     def do_print_unallocated(self, arg):
         """Usage: print_unallocated [--o=filename]"""
         filename = arg['--o']
-        print(self.amity.print_unallocated(arg['--o']))
+        cprint(self.amity.print_unallocated(arg['--o']), "blue")
 
     @docopt_cmd
     def do_print_person_id(self, arg):
         """ Usage: print_person_id <first_name> <last_name> """
-        print(self.amity.print_person_id(
-            arg['<first_name>'], arg['<last_name>']))
+        cprint(self.amity.print_person_id(
+            arg['<first_name>'], arg['<last_name>']), "blue")
 
     @docopt_cmd
     def do_allocate_office_waiting_list(self, arg):
         """Usage: allocate_office_waiting_list"""
-        print(self.amity.allocate_office_waiting_list())
+        cprint(self.amity.allocate_office_waiting_list(), "blue")
 
     @docopt_cmd
     def do_allocate_livingspace_waiting_list(self, arg):
         """Usage: allocate_office_waiting_list"""
-        print(self.amity.allocate_livingspace_waiting_list())
+        cprint(self.amity.allocate_livingspace_waiting_list(), "blue")
 
     @docopt_cmd
     def do_print_all_rooms(self, arg):
         """Usage: print_all_rooms"""
-        print(self.amity.print_all_rooms())
+        cprint(self.amity.print_all_rooms(), "blue")
 
     @docopt_cmd
     def do_print_room(self, arg):
         """Usage: print_all_rooms <room_name>"""
         room_name = arg['<room_name>']
-        print(self.amity.print_room(room_name))
+        cprint(self.amity.print_room(room_name), "blue")
 
     @docopt_cmd
     def do_print_available_rooms(self, arg):
         """Usage: print_available_rooms"""
-        print(self.amity.print_available_rooms())
+        cprint(self.amity.print_available_rooms(), "blue")
 
     @docopt_cmd
     def do_save_state(self, args):
         """Usage: save_state [--db=sqlite_database]"""
         db_name = args['--db']
-        print(self.amity.save_state(args['--db']))
+        cprint(self.amity.save_state(args['--db']), "blue")
 
     @docopt_cmd
     def do_load_state(self, args):
         """Usage: load_state [--db=sqlite_database]"""
         db_name = args['--db']
-        print(self.amity.load_state(args['--db']))
+        cprint(self.amity.load_state(args['--db']), "blue")
 
     def do_quit(self, arg):
         """Quits out of Interactive Mode."""
 
-        print('Good Bye!')
+        cprint('Good Bye!', "blue")
         exit()
 
 
 if __name__ == '__main__':
     # opt = docopt(__doc__, sys.argv[1:])
     opt = (__doc__)
-    print(opt)
+    cprint(opt, 'blue')
     Amityapp().cmdloop()
 
 # if opt['--interactive']:
