@@ -253,10 +253,6 @@ class ModelsTest(unittest.TestCase):
         unallocated = self.amity.print_unallocated()
         self.assertIn("People not allocated to living space", unallocated)
 
-    def test_cannot_delete_non_existent_room(self):
-        '''Asserts that one cannot delete a room that does not exist'''
-        pass
-
     def test_successfully_unallocated_saved_to_text_file(self):
         """Assert message successfully saved to filename"""
         self.amity.living_space_waiting_list = []
