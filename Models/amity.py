@@ -242,6 +242,32 @@ class Amity:
             msg += "\nNo livingspace available\n"
         return msg
 
+    def delete_room(self, room_name):
+        all_rooms = self.rooms['office'] + self.rooms['living_space']
+        msg = ''
+        room_name = room_name.title()
+        for room in all_rooms:
+            if room_name == room.room_name:
+                offices = self.rooms['office']
+                if room in offices:
+                    for occupant in room.occupants:
+                        self.office_waiting_list.append(occupant)
+                    self.rooms['office'].remove(room)
+                    msg += 'Successfully deleted room {}'.format(
+                        room.room_name)
+                livingspaces = self.rooms['living_space']
+                if room in livingspaces:
+                    for occupant in room.occupants:
+                        self.living_space_waiting_list(occupant)
+                    self.rooms['living_space'].remove(room)
+                    msg += 'Successfully deleted room {}'.format(
+                        room.room_name)
+            else:
+                msg += 'Room {} does not exist'.format(room.room_name)
+        return msg
+
+        pass
+
     def load_people(self, filename):
         msg = ''
         try:
