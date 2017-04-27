@@ -142,7 +142,7 @@ class Amityapp(cmd.Cmd):
     def do_print_room(self, arg):
         """Usage: print_all_rooms <room_name>"""
         room_name = arg['<room_name>']
-        print(self.amity.print_room())
+        print(self.amity.print_room(room_name))
 
     @docopt_cmd
     def do_print_available_rooms(self, arg):

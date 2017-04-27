@@ -16,18 +16,18 @@ class ModelsTest(unittest.TestCase):
     def test_room_exists(self):
         """Asserts tsavo already exists"""
         existing_room = self.amity.create_room("office", ["tsavo"])
-        self.assertIn('tsavo already exists', existing_room)
+        self.assertIn('Tsavo already exists', existing_room)
 
     def test_office_created_successfully(self):
         """Asserts that an office has been successfully been created"""
         new_office = self.amity.create_room("office", ["camelot"])
-        self.assertIn("Successfully created Office camelot",
+        self.assertIn("Successfully created Office Camelot",
                       new_office)
 
     def test_livingspace_created_successfully(self):
         """Asserts livingspace has been successfully been created"""
         new_living_space = self.amity.create_room("livingspace", ["php"])
-        self.assertIn("Successfully created Living Space php",
+        self.assertIn("Successfully created Living Space Php",
                       new_living_space)
 
     def test_cannot_allocate_invalid_roomtype(self):
@@ -43,26 +43,26 @@ class ModelsTest(unittest.TestCase):
     def test_fellow_added_successfully(self):
         """Asserts fellow has been added successfully"""
         new_fellow = self.amity.add_person("fellow", "maryann", "ngumi", "Y")
-        self.assertIn("FELLOW MARYANN NGUMI successfully added",
+        self.assertIn("Fellow Maryann Ngumi successfully added",
                       new_fellow)
 
     def test_fellow_allocated_to_office(self):
         """Asserts that fellow has been allocated a office successfully"""
         new_fellow = self.amity.add_person("fellow", "alex", "mbugua", "Y")
-        self.assertIn("You have been allocated to office tsavo",
+        self.assertIn("You have been allocated to office Tsavo",
                       new_fellow,)
 
     def test_fellow_allocated_to_living_space(self):
         """Asserts that fellow has been allocated a living space successfully"""
         new_fellow = self.amity.add_person("fellow", "alex", "mbugua", "Y")
-        self.assertIn("You have been allocated to living space topaz",
+        self.assertIn("You have been allocated to living space Topaz",
                       new_fellow,)
 
     def test_staff_added_successfully(self):
         """Asserts staff has been added successfully"""
         new_staff = self.amity.add_person("staff", "john", "ngumi")
-        self.assertIn("STAFF JOHN NGUMI successfully added",
-                      new_staff, msg='STAFF JOHN NGUMI successfully added')
+        self.assertIn("Staff John Ngumi successfully added",
+                      new_staff)
 
     def test_staff_cannot_get_accommodation(self):
         """Asserts staff cannot get accommodation"""
@@ -73,25 +73,25 @@ class ModelsTest(unittest.TestCase):
     def test_staff_allocated_to_office(self):
         """Asserts that staff has been allocated a office successfully"""
         new_staff = self.amity.add_person("staff", "thomas", "muchiri", "N")
-        self.assertIn("You have been allocated to office tsavo",
+        self.assertIn("You have been allocated to office Tsavo",
                       new_staff)
 
     def test_fellow_allocated_to_office_waiting_list_if_no_office(self):
-        """Asserts that fellow has been aldded to office waiting list"""
+        """Asserts that fellow has been aldded to office waiting list if no office"""
         office = self.amity.rooms['office'] = []
         new_fellow = self.amity.add_person("fellow", "alex", "mbugua", "Y")
         self.assertIn("You have been added to office waiting list",
                       new_fellow)
 
     def test_fellow_allocated_to_living_space_waiting_list_if_no_living_space(self):
-        """Asserts that fellow has been added to living space waiting list"""
+        """Asserts that fellow has been added to living space waiting list if no living space"""
         livingspace = self.amity.rooms['living_space'] = []
         new_fellow = self.amity.add_person("fellow", "alex", "mbugua", "Y")
         self.assertIn("You have been added to living space waiting list",
                       new_fellow)
 
     def test_staff_allocated_to_office_waiting_list_if_no_office(self):
-        """Asserts that staff has been added to office waiting list"""
+        """Asserts that staff has been added to office waiting list if no office"""
         office = self.amity.rooms['office'] = []
         new_staff = self.amity.add_person("staff", "ken", "olalo")
         self.assertIn("You have been added to office waiting list", new_staff)
@@ -157,22 +157,22 @@ class ModelsTest(unittest.TestCase):
         self.amity.create_room("office", ["meru"])
         fellow_id = self.amity.print_person_id("ivan", "pycharm").split(' ')
         reallocate_fellow = self.amity.reallocate_person(fellow_id[0], 'meru')
-        self.assertIn('Successfully reallocated to meru', reallocate_fellow)
+        self.assertIn('Successfully reallocated to Meru', reallocate_fellow)
 
     def test_cannot_allocate_office_waiting_list_if_no_office(self):
         """Assert person in office list cannot be allocated to a room if there is no office available"""
         self.amity.rooms['office'] = []
         self.amity.add_person("fellow", "ivan", "pycharm")
         allocate_office = self.amity.allocate_office_waiting_list()
-        self.assertIn('No office available', allocate_office)
+        self.assertIn('No offices available', allocate_office)
 
     def test_allocate_office_waiting_list(self):
-        """Assert alloated people in office list to an office"""
+        """Assert allocated people in office list to an office"""
         self.amity.rooms['office'] = []
         self.amity.add_person("fellow", "ivan", "pycharm")
         self.amity.create_room("office", ["toll"])
         allocate = self.amity.allocate_office_waiting_list()
-        self.assertIn('You have been allocted to room toll', allocate)
+        self.assertIn('Ivan Pycharm has been allocted to room Toll', allocate)
 
     def test_cannot_allocate_people_in_living_space_waiting_list_if_no_living_space(self):
         """Assert person in living space waiting list cannot be allocated to a room if there is no living space"""
@@ -181,13 +181,36 @@ class ModelsTest(unittest.TestCase):
         allocate_living_space = self.amity.allocate_livingspace_waiting_list()
         self.assertIn('No livingspace available', allocate_living_space)
 
-    def test_allocate_living_space_waiting_list(self):
-        """Assert allocate people in living space waiting list successfully"""
+    def test_allocate_fellow_living_space_waiting_list(self):
+        """Assert allocate fellow in living space waiting list successfully"""
         self.amity.rooms['living_space'] = []
         self.amity.add_person("fellow", "ivan", "pycharm")
-        self.amity.create_room("livingspace", ["ruiru"])
+        # self.amity.create_room("livingspace", ["ruiru"])
         allocate = self.amity.allocate_livingspace_waiting_list()
-        self.assertIn('You have been allocted to room ruiru', allocate)
+        self.assertIn(
+            'You have been added to living space waiting list', allocate)
+
+    def test_delete_office_successfully(self):
+        """Asserts that an office can be deleted successfully"""
+        self.amity.create_room("tsavo", "office")
+        deleted_room = self.amity.delete_room("tsavo")
+        self.assertIn("Successfully deleted room Tsavo", deleted_room)
+
+    def test_delete_living_space_successfully(self):
+        """Asserts that living space can be deleted successfully"""
+        self.amity.create_room("topaz", "living_space")
+        deleted_room = self.amity.delete_room("topaz")
+        self.assertIn("Successfully deleted room Topaz", deleted_room)
+
+    def test_cannot_delete_non_existent_room(self):
+        """Asserts that one cannot delete an existet room"""
+        deleted_room = self.amity.delete_room("huhu")
+        self.assertIn("Room Huhu does not exist", deleted_room)
+
+    def test_cannot_load_people_from_non_existent_file(self):
+        """Asserts that one cannot load people from a file that does not exist"""
+        load_people = self.amity.load_people('haha')
+        self.assertIn('File does not exist', load_people)
 
     def test_no_available_offices(self):
         """Assert message where there are no rooms"""
@@ -200,7 +223,7 @@ class ModelsTest(unittest.TestCase):
         """Assert message where there are no occupants in the room"""
         self.amity.create_room("office", ["toll"])
         no_occupants = self.amity.print_allocations()
-        self.assertIn("There are no allocations", no_occupants)
+        self.assertIn("There are no allocations in the room", no_occupants)
 
     def test_assert_successfully_saved_to_text_file(self):
         """Assert successfully saved to text file"""

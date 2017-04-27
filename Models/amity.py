@@ -335,7 +335,7 @@ class Amity:
                                 person.last_name + ",")
                     msg += '\n\n'
             if msg == '':
-                return 'There are no allocations'
+                return 'There are no allocations in the room'
             if filename:
                 file = open(filename, 'w')
                 file.write(msg)
@@ -397,17 +397,20 @@ class Amity:
             msg += "\nThere are no livingspaces"
         return msg
 
-    def print_room(self):
+    def print_room(self, room_name):
         """Prints the occupants of the room provided"""
         msg = ''
         all_rooms = self.rooms["office"] + self.rooms["living_space"]
         for room in all_rooms:
-            if len(room.occupants) > 0:
-                for person in room.occupants:
-                    msg += str(person.first_name) + ' ' + \
-                        person.last_name + '\n'
+            if room_name == room.room_name:
+                if len(room.occupants) > 0:
+                    for person in room.occupants:
+                        msg += str(person.first_name) + ' ' + \
+                            person.last_name + '\n'
+                else:
+                    msg += "There are no occupants in the room"
             else:
-                msg += "There are no occupants in the room"
+                msg += "{} does not exist".format(room.room_name)
         return msg
 
     def save_state(self, dbname="amity.db"):
