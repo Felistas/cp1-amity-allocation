@@ -275,6 +275,11 @@ class Amity:
                 person.first_name + ' ' + person.last_name
         return msg
 
+    def delete_person(self, person_id):
+        """Deletes a person in the system"""
+        all_rooms = self.rooms['office'] + self.rooms['living_space']
+        pass
+
     def load_people(self, filename):
         msg = ''
         try:
