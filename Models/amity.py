@@ -276,11 +276,34 @@ class Amity:
         return msg
 
     def delete_person(self, person_id):
-        """Deletes a person in the system"""
+        """
+        Check if the person exists in the system
+        Deletes a person in the room he/she was in
+
+        """
+        msg = ''
+        person = [person for person in self.people if int(person_id) ==
+                  person.person_id]
         all_rooms = self.rooms['office'] + self.rooms['living_space']
-        pass
+        room = [room for room in all_rooms if room == room.room_name]
+        print(room)
+        if person in self.office_waiting_list:
+            self.office_waiting_list.remove(person)
+        if person in self.living_space_waiting_list:
+            self.living_space_waiting_list.remove(person)
+
+        if person in room[0].occupants:
+            room.occupants.remove(person)
+            self.people.remove(person)
+            msg += 'Successfully deleted {}'.format(person.first_name,person.last_name)
+        else:
+            msg += 'Person does not exist'
+
 
     def load_people(self, filename):
+        '''Adds people in the system from a text file
+        Allocates rooms to people in the text file
+        '''
         msg = ''
         try:
             with open(filename + '.txt') as f:

@@ -12,6 +12,7 @@ Usage:
     Amity print_unallocated [-o=filename]
     Amity print_available_rooms
     Amity delete_room <room_name>
+    Amity delete_person <person_id>
     Amity print_all_rooms
     Amity allocate_office_waiting_list
     Amity allocate_livingspace_waiting_list
@@ -111,8 +112,14 @@ class Amityapp(cmd.Cmd):
 
     @docopt_cmd
     def do_delete_room(self, arg):
-        """Usage: delete_person <room_name>"""
+        """Usage: delete_room <room_name>"""
         cprint(self.amity.delete_room(arg['<room_name>']), "blue")
+
+    @docopt_cmd
+    def do_delete_person(self, arg):
+        """Usage: delete_person <person_id>"""
+        cprint(self.amity.delete_person(arg['<person_id>']), "blue")
+
 
     @docopt_cmd
     def do_load_people(self, arg):
