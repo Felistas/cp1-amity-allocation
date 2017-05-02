@@ -59,11 +59,10 @@ class ModelsTest(unittest.TestCase):
         self.amity.rooms['living_space'] = []
         self.amity.rooms['office'] = []
         self.amity.people = []
-        self.amity.create_room("living_space", ["topaz"])
-        self.amity.create_room("office", ["tsavo"])
+        self.amity.create_room("livingspace", ["topaz"])
+        #self.amity.create_room("office", ["tsavo"])
         new_fellow = self.amity.add_person("fellow", "alex", "mbugua", "Y")
-        self.assertIn(
-            "You have been allocated to living space Topaz", new_fellow)
+        self.assertIn("You have been allocated to living space Topaz", new_fellow)
 
     def test_staff_added_successfully(self):
         """Asserts staff has been added successfully"""
@@ -126,21 +125,26 @@ class ModelsTest(unittest.TestCase):
 
     def test_cannot_reallocate_staff_to_livingspace(self):
         """Asserts that cannot reallocate staff to livingspace"""
+        self.amity.people=[]
+        self.amity.rooms['living_space'] = []
+        self.amity.rooms['office'] = []
+        self.amity.create_room("office", ["narnia"])
+        new_living_space = self.amity.create_room("livingspace", ["topaz"])
         staff = self.amity.add_person("staff", "paul", "upendo")
         staff_id = self.amity.print_person_id("paul", "upendo").split(' ')
         reallocate_staff = self.amity.reallocate_person(staff_id[0], 'topaz')
-        self.assertIn('Cannot reallocate staff to livingspace',
-                      reallocate_staff)
+        self.assertIn('Cannot reallocate staff to livingspace',reallocate_staff)
 
     def test_cannot_reallocate_fellow_to_livingspace(self):
         """Assert cannot reallocate to different room type"""
         self.amity.rooms['living_space'] = []
-        fellow = self.amity.add_person("fellow", "olivia", "onyango")
+        self.amity.rooms['office'] = []
+        self.amity.create_room("office", ["narnia"])
         new_living_space = self.amity.create_room("livingspace", ["php"])
-        staff_id = self.amity.print_person_id("olivia", "onyango").split(' ')
-        reallocate_fellow = self.amity.reallocate_person(staff_id[0], 'php')
-        self.assertIn(
-            'Cannot reallocate from one room type to another', reallocate_fellow)
+        fellow = self.amity.add_person("fellow", "olivia", "onyango")
+        fellow_id = self.amity.print_person_id("olivia", "onyango").split(' ')
+        reallocate_fellow = self.amity.reallocate_person(fellow_id[0], 'php')
+        self.assertIn('Cannot reallocate from one room type to another', reallocate_fellow)
 
     def test_cannot_reallocate_to_full_room(self):
         """Assert that one cannot be reallocated to a full room"""
@@ -161,8 +165,9 @@ class ModelsTest(unittest.TestCase):
     def test_cannot_reallocate_to_same_room(self):
         """Assert that a person cannot be reallocated to the same room"""
         self.amity.rooms['office'] = []
+        self.amity.people = []
         self.amity.create_room("office", ["narnia"])
-        self.amity.add_person("fellow", "ivan", "pycharm")
+        self.amity.add_person("staff", "ivan", "pycharm")
         fellow_id = self.amity.print_person_id("ivan", "pycharm").split(' ')
         reallocate_fellow = self.amity.reallocate_person(fellow_id[0], 'narnia')
         self.assertIn('Cannot reallocate to the same room', reallocate_fellow)
@@ -182,6 +187,9 @@ class ModelsTest(unittest.TestCase):
 
     def test_cannot_reallocate_to_non_existent_room(self):
         """Asserts that cannot reallocate to non existent room"""
+        self.amity.people = []
+        self.amity.rooms['office'] = []
+        self.amity.create_room("office", ["red"])
         self.amity.add_person("fellow", "ivan", "pycharm")
         fellow_id = self.amity.print_person_id("ivan", "pycharm").split(' ')
         reallocate_fellow = self.amity.reallocate_person(fellow_id[0], 'meru')
@@ -197,7 +205,9 @@ class ModelsTest(unittest.TestCase):
     def test_allocate_office_waiting_list(self):
         """Assert allocated people in office list to an office"""
         self.amity.rooms['office'] = []
-        self.amity.add_person("fellow", "ivan", "pycharm")
+        self.amity.office_waiting_list = []
+        self.amity.people = []
+        self.amity.add_person("staff", "ivan", "pycharm")
         self.amity.create_room("office", ["toll"])
         allocate = self.amity.allocate_office_waiting_list()
         self.assertIn('Ivan Pycharm has been allocted to room Toll', allocate)
@@ -213,24 +223,28 @@ class ModelsTest(unittest.TestCase):
         """Assert allocate people in living space list to a living space"""
         self.amity.rooms['living_space'] = []
         self.amity.add_person("fellow", "Felistas", "Ngumi", "yes")
-        self.amity.create_room("living_space", ["php"])
+        self.amity.create_room("livingspace", ["php"])
         allocate = self.amity.allocate_livingspace_waiting_list()
         self.assertIn('Felistas Ngumi has been allocted to room Php', allocate)
 
     def test_delete_office_successfully(self):
         """Asserts that an office can be deleted successfully"""
-        self.amity.create_room("tsavo", "office")
+        self.amity.rooms['office'] = []
+        self.amity.create_room("office",["tsavo"])
         deleted_room = self.amity.delete_room("tsavo")
         self.assertIn("Successfully deleted room Tsavo", deleted_room)
 
     def test_delete_living_space_successfully(self):
         """Asserts that living space can be deleted successfully"""
-        self.amity.create_room("topaz", "living_space")
-        deleted_room = self.amity.delete_room("topaz")
-        self.assertIn("Successfully deleted room Topaz", deleted_room)
+        self.amity.rooms['living_space'] = []
+        self.amity.create_room("livingspace",["blue"])
+        deleted_room = self.amity.delete_room("blue")
+        self.assertIn("Successfully deleted room Blue", deleted_room)
 
     def test_cannot_delete_non_existent_room(self):
         """Asserts that one cannot delete an existent room"""
+        self.amity.rooms['living_space'] = []
+        self.amity.rooms['office'] = []
         deleted_room = self.amity.delete_room("huhu")
         self.assertIn("Room Huhu does not exist", deleted_room)
 

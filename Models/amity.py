@@ -261,8 +261,8 @@ class Amity:
                     self.rooms['living_space'].remove(room)
                     msg += 'Successfully deleted room {}'.format(
                         room.room_name)
-            else:
-                msg += 'Room {} does not exist'.format(room.room_name)
+        if msg == '':
+            msg += 'Room {} does not exist'.format(room_name)
         return msg
 
     def list_all_people(self):
