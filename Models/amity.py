@@ -279,26 +279,24 @@ class Amity:
         """
         Check if the person exists in the system
         Deletes a person in the room he/she was in
-
         """
         msg = ''
-        person = [person for person in self.people if int(person_id) ==
-                  person.person_id]
-        all_rooms = self.rooms['office'] + self.rooms['living_space']
-        room = [room for room in all_rooms if room == room.room_name]
-        print(room)
-        if person in self.office_waiting_list:
-            self.office_waiting_list.remove(person)
-        if person in self.living_space_waiting_list:
-            self.living_space_waiting_list.remove(person)
-
-        if person in room[0].occupants:
-            room.occupants.remove(person)
-            self.people.remove(person)
-            msg += 'Successfully deleted {}'.format(person.first_name,person.last_name)
+        person = [person for person in self.people if int(person_id) == person.person_id]
+        if len(person) > 0:
+            all_rooms = self.rooms['office'] + self.rooms['living_space']
+            if person[0] in self.office_waiting_list:
+                self.office_waiting_list.remove(person[0])
+            if person[0] in self.living_space_waiting_list:
+                self.living_space_waiting_list.remove(person[0])
+            if len(all_rooms)>0:
+                for room in all_rooms:
+                    if person[0] in room.occupants:
+                        room.occupants.remove(person[0])
+            self.people.remove(person[0])
+            msg += 'Successfully deleted {}'.format(person[0].first_name)
         else:
             msg += 'Person does not exist'
-
+        return msg
 
     def load_people(self, filename):
         '''Adds people in the system from a text file
@@ -518,7 +516,6 @@ class Amity:
         people = curs.fetchall()
         self.people = []
         for person in people:
-            print(person)
             if person[2] == 'Staff':
                 staff = Staff(person[2], person[1].split(
                     ' ')[0], person[1].split(' ')[1], person[3])
@@ -547,7 +544,7 @@ class Amity:
                 office_occupants = []
                 for occupant in room[3][:-1].split(' '):
                     for person in self.people:
-                        if person.id == int(occupant):
+                        if person.id == str(occupant):
                             office_occupants.append(person)
                 office.occupants = office_occupants
                 self.rooms['office'].append(office)

@@ -202,6 +202,7 @@ class ModelsTest(unittest.TestCase):
         allocate_office = self.amity.allocate_office_waiting_list()
         self.assertIn('No offices available', allocate_office)
 
+
     def test_allocate_office_waiting_list(self):
         """Assert allocated people in office list to an office"""
         self.amity.rooms['office'] = []
@@ -247,6 +248,13 @@ class ModelsTest(unittest.TestCase):
         self.amity.rooms['office'] = []
         deleted_room = self.amity.delete_room("huhu")
         self.assertIn("Room Huhu does not exist", deleted_room)
+    def test_delete_person(self):
+        """Asserts that a person has been deleted successfully"""
+        self.amity.people = []
+        self.amity.add_person("fellow", "Felistas", "Ngumi", "yes")
+        fellow_id = self.amity.print_person_id("felistas", "ngumi").split(' ')
+        delete_person = self.amity.delete_person(fellow_id[0])
+        self.assertIn('Successfully deleted Felistas',delete_person)
 
     def test_cannot_load_people_from_non_existent_file(self):
         """Asserts that one cannot load people from a file that does not exist"""
@@ -301,12 +309,12 @@ class ModelsTest(unittest.TestCase):
         self.amity.add_person("fellow", "ivan", "pycharm", "Y")
         room = self.amity.print_unallocated("filename")
         self.assertIn("Successfully saved to filename", room)
-    #
-    # def test_load_state_successfully(self):
-    #     """Asserts that load state has been loaded successfully"""
-    #     msg_load_state = self.amity.load_state("amity")
-    #     self.assertIn(
-    #         'Successfully loaded data from the Database', msg_load_state)
+
+    def test_load_state_successfully(self):
+        """Asserts that load state has been loaded successfully"""
+        msg_load_state = self.amity.load_state("amity")
+        self.assertIn(
+            'Successfully loaded data from the Database', msg_load_state)
 
     def test_save_test(self):
         """Asserts that state is not saved if not provided database name"""
