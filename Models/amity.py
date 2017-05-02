@@ -1,5 +1,6 @@
 import random
 import sqlite3
+from termcolor import colored
 from tabulate import tabulate
 from Models.person import Fellow, Staff
 from Models.room import Office, LivingSpace
@@ -26,16 +27,18 @@ class Amity:
             check_room = [
                 room.room_name for room in all_rooms if room.room_name == room_name]
             if check_room:
-                msg += '\n{} already exists\n'.format(room_name)
+                msg += colored('\n{} already exists\n'.format(room_name),'yellow')
             else:
                 if room_type == 'Office':
                     room = Office(room_name)
                     self.rooms['office'].append(room)
-                    msg += '\nSuccessfully created Office ' + room.room_name + '\n'
+
+                    msg += colored('\nSuccessfully created Office ' + room.room_name + '\n','green')
+
                 elif room_type == 'Livingspace':
                     room = LivingSpace(room_name)
                     self.rooms['living_space'].append(room)
-                    msg += '\nSuccessfully created Living Space ' + room.room_name + '\n'
+                    msg += colored('\nSuccessfully created Living Space ' + room.room_name + '\n', 'green')
         return msg
 
     def allocate_room(self, room_type):
@@ -44,6 +47,7 @@ class Amity:
         Selects a living space at random
         Checks that room type should be either livingspace or office
         '''
+        msg = ''
         room_type = room_type.title()
         if room_type == "Office":
             offices = self.rooms['office']
@@ -54,7 +58,8 @@ class Amity:
             if len(living_spaces):
                 return random.choice(self.rooms['living_space'])
         else:
-            return 'Invalid room type'
+            msg += colored('Invalid room type','red')
+        return msg
 
     def add_person(self, role, first_name, last_name, accommodation="NO"):
         '''
@@ -77,20 +82,20 @@ class Amity:
             if role == 'Fellow':
                 fellow = Fellow(role, first_name, last_name, accommodation)
                 self.people.append(fellow)
-                msg += ('\n' + fellow.role + ' ' + fellow.first_name + ' ' +
-                        fellow.last_name + ' successfully added\n')
+                msg += colored(('\n' + fellow.role + ' ' + fellow.first_name + ' ' +
+                        fellow.last_name + ' successfully added\n'),'green')
                 office_selected_random = self.allocate_room("office")
                 if office_selected_random:
                     if len(office_selected_random.occupants) < office_selected_random.capacity:
                         office_selected_random.occupants.append(fellow)
-                        msg += '\nYou have been allocated to office ' + \
-                            office_selected_random.room_name + '\n'
+                        msg += colored('\nYou have been allocated to office ' + \
+                            office_selected_random.room_name + '\n','green')
                     else:
                         self.office_waiting_list.append(fellow)
-                        msg += '\nYou have been added to office waiting list \n'
+                        msg += colored('\nYou have been added to office waiting list \n','yellow')
                 else:
                     self.office_waiting_list.append(fellow)
-                    msg += '\nYou have been added to office waiting list \n'
+                    msg += colored('\nYou have been added to office waiting list \n','yellow')
                 if accommodation == 'Yes' or accommodation == 'Y':
                     living_space_selected_random = self.allocate_room(
                         "livingspace")
@@ -98,33 +103,33 @@ class Amity:
                         if len(living_space_selected_random.occupants) < living_space_selected_random.capacity:
                             living_space_selected_random.occupants.append(
                                 fellow)
-                            msg += '\nYou have been allocated to living space ' + \
-                                living_space_selected_random.room_name + '\n'
+                            msg += colored('\nYou have been allocated to living space ' + \
+                                living_space_selected_random.room_name + '\n','green')
                         else:
                             self.living_space_waiting_list.append(fellow)
-                            msg += '\nYou have been added to living space waiting list \n'
+                            msg += colored('\nYou have been added to living space waiting list \n','yellow')
                     else:
                         self.living_space_waiting_list.append(fellow)
-                        msg += '\nYou have been added to living space waiting list \n'
+                        msg += colored('\nYou have been added to living space waiting list \n','yellow')
             elif role == 'Staff':
                 if accommodation == 'Yes' or accommodation == "Y":
                     msg += "\nStaff cannot get accommodation \n"
                 staff = Staff(role, first_name, last_name,  accommodation)
                 self.people.append(staff)
-                msg += '\n{} {} {} successfully added\n'.format(
-                    staff.role, staff.first_name, staff.last_name)
+                msg += colored('\n{} {} {} successfully added\n'.format(
+                    staff.role, staff.first_name, staff.last_name),'green')
                 office_selected_random = self.allocate_room("office")
                 if office_selected_random:
                     if len(office_selected_random.occupants) < office_selected_random.capacity:
                         office_selected_random.occupants.append(staff)
-                        msg += '\nYou have been allocated to office ' + \
-                            office_selected_random.room_name + '\n'
+                        msg += colored('\nYou have been allocated to office ' + \
+                            office_selected_random.room_name + '\n','green')
                     else:
                         self.office_waiting_list.append(staff)
-                        msg += '\nYou have been added to office waiting list \n'
+                        msg += colored('\nYou have been added to office waiting list \n','yellow')
                 else:
                     self.office_waiting_list.append(staff)
-                    msg += '\nYou have been added to office waiting list \n'
+                    msg += colored('\nYou have been added to office waiting list \n','yellow')
         return msg
 
     def print_person_id(self, first_name, last_name):
@@ -136,10 +141,10 @@ class Amity:
                person.first_name and last_name == person.last_name]
         if len(ids) > 0:
             for id in ids:
-                msg += str(id.person_id) + ' ' + id.first_name + \
-                    ' ' + id.last_name + '\n'
+                msg += colored(str(id.person_id) + ' ' + id.first_name + \
+                    ' ' + id.last_name + '\n','green')
         else:
-            msg += "Person does not exist"
+            msg += colored("Person does not exist",'yellow')
         return msg
 
     def reallocate_person(self, person_id, room_name):
@@ -158,7 +163,7 @@ class Amity:
         person = [person for person in self.people if int(person_id) ==
                   person.person_id]
         if len(person) == 0:
-            return '\n{} does not exist\n'.format(person_id)
+            return colored('\n{} does not exist\n'.format(person_id),'yellow')
         person = person[0]
         all_rooms = self.rooms['office'] + self.rooms['living_space']
         new_room = None
@@ -170,25 +175,25 @@ class Amity:
             if person in room.occupants:
                 previous_rooms.append(room)
         if len(previous_rooms) == 0:
-            return '\n{} had not been allocated a room\n'.format(person.first_name)
+            return colored('\n{} had not been allocated a room\n'.format(person.first_name),'yellow')
         if new_room is not None:
             room_type = type(new_room)
             role = person.role.title()
             if role == 'Staff' and room_type == LivingSpace:
-                return '\nCannot reallocate staff to livingspace\n'
+                return colored('\nCannot reallocate staff to livingspace\n','yellow')
             if not type(new_room) in [type(room) for room in previous_rooms]:
-                return '\nCannot reallocate from one room type to another\n'
+                return colored('\nCannot reallocate from one room type to another\n','yellow')
             if len(new_room.occupants) == new_room.capacity:
-                return '\nRoom is full\n'
+                return colored('\nRoom is full\n','yellow')
             if new_room in previous_rooms:
-                return '\nCannot reallocate to the same room\n'
+                return colored('\nCannot reallocate to the same room\n','yellow')
             for room in previous_rooms:
                 if person in room.occupants:
                     room.occupants.remove(person)
             new_room.occupants.append(person)
-            return '\nSuccessfully reallocated to {}\n'.format(new_room.room_name)
+            return colored('\nSuccessfully reallocated to {}\n'.format(new_room.room_name),'green')
         else:
-            return '\n{} does not exist\n'.format(room_name)
+            return colored('\n{} does not exist\n'.format(room_name),'red')
 
     def allocate_office_waiting_list(self):
         '''
@@ -205,15 +210,15 @@ class Amity:
                     if len(random_office.occupants) < random_office.capacity:
                         random_office.occupants.append(person)
                         self.office_waiting_list.remove(person)
-                        msg += "\n{} {} has been allocted to room {}\n".format(person.first_name, person.last_name,
-                                                                               random_office.room_name)
+                        msg += colored("\n{} {} has been allocted to room {}\n".format(person.first_name, person.last_name,
+                                                                               random_office.room_name),'green')
                     else:
-                        msg += "\nNo offices available\n"
+                        msg += colored("\nNo offices available\n",'yellow')
 
             else:
-                msg += "\nThere are no people in the waiting list\n"
+                msg += colored("\nThere are no people in the waiting list\n",'yellow')
         else:
-            msg += "\nNo offices available\n"
+            msg += colored("\nNo offices available\n",'yellow')
         return msg
 
     def allocate_livingspace_waiting_list(self):
@@ -231,14 +236,14 @@ class Amity:
                     if len(random_living_space.occupants) < random_living_space.capacity:
                         random_living_space.occupants.append(person)
                         self.living_space_waiting_list.remove(person)
-                        msg += "\n{} {} has been allocted to room {}\n".format(person.first_name, person.last_name,
-                                                                               random_living_space.room_name)
+                        msg += colored("\n{} {} has been allocted to room {}\n".format(person.first_name, person.last_name,
+                                                                               random_living_space.room_name),'green')
                     else:
-                        msg += "\nNo livingspace available\n"
+                        msg += colored("\nNo livingspace available\n",'yellow')
             else:
-                msg += "\nThere are no people in the waiting list\n"
+                msg += colored("\nThere are no people in the waiting list\n",'yellow')
         else:
-            msg += "\nNo livingspace available\n"
+            msg += colored("\nNo livingspace available\n",'yellow')
         return msg
 
     def delete_room(self, room_name):
@@ -252,27 +257,27 @@ class Amity:
                     for occupant in room.occupants:
                         self.office_waiting_list.append(occupant)
                     self.rooms['office'].remove(room)
-                    msg += 'Successfully deleted room {}'.format(
-                        room.room_name)
+                    msg += colored('Successfully deleted room {}'.format(
+                        room.room_name),'green')
                 livingspaces = self.rooms['living_space']
                 if room in livingspaces:
                     for occupant in room.occupants:
                         self.living_space_waiting_list.append(occupant)
                     self.rooms['living_space'].remove(room)
-                    msg += 'Successfully deleted room {}'.format(
-                        room.room_name)
+                    msg += colored('Successfully deleted room {}'.format(
+                        room.room_name),'green')
         if msg == '':
-            msg += 'Room {} does not exist'.format(room_name)
+            msg += colored('Room {} does not exist'.format(room_name),'yellow')
         return msg
 
     def list_all_people(self):
         """Lists all people in the system"""
         msg = ''
+        msg += "People\n"
+        msg += "-----------------------------------------\n"
         for person in self.people:
-            msg += "People\n"
-            msg += "-----------------------------------------\n"
-            msg += str(person.person_id) + ' ' + \
-                person.first_name + ' ' + person.last_name
+            msg += colored(str(person.person_id) + ' ' + \
+                person.first_name + ' ' + person.last_name + '\n','green')
         return msg
 
     def delete_person(self, person_id):
@@ -293,9 +298,9 @@ class Amity:
                     if person[0] in room.occupants:
                         room.occupants.remove(person[0])
             self.people.remove(person[0])
-            msg += 'Successfully deleted {}'.format(person[0].first_name)
+            msg += colored('Successfully deleted {}'.format(person[0].first_name),'green')
         else:
-            msg += 'Person does not exist'
+            msg += colored('Person does not exist','yellow')
         return msg
 
     def load_people(self, filename):
@@ -316,7 +321,7 @@ class Amity:
                     msg += self.add_person(role, first_name,
                                            last_name, accommodation)
         except:
-            msg += 'File does not exist'
+            msg += colored('File does not exist','red')
         return msg
 
     def print_available_rooms(self):
@@ -330,24 +335,24 @@ class Amity:
         offices = self.rooms['office']
         for office in offices:
             if len(office.occupants) < office.capacity:
-                msg1 += "Offices"
-                msg1 += "\n--------------------------- \n"
-                msg1 += office.room_name
+                msg1 += colored("Offices",'green')
+                msg1 += colored("\n--------------------------- \n",'green')
+                msg1 += colored(office.room_name,'green')
             else:
-                msg1 += "\nNo offices available\n"
+                msg1 += colored("\nNo offices available\n",'yellow')
         if msg1 == '':
-            msg1 += "\nNo offices available\n"
+            msg1 += colored("\nNo offices available\n",'yellow')
         msg2 = ''
         living_spaces = self.rooms['living_space']
         for living_space in living_spaces:
             if len(living_space.occupants) < living_space.capacity:
-                msg2 += "\nLiving Spaces"
-                msg2 += "\n--------------------------- \n"
-                msg2 += living_space.room_name
+                msg2 += colored("\nLiving Spaces",'green')
+                msg2 += colored("\n--------------------------- \n",'green')
+                msg2 += colored(living_space.room_name,'green')
             else:
-                msg2 += "\nNo living spaces available\n"
+                msg2 += colored("\nNo living spaces available\n",'yellow')
         if msg2 == '':
-            msg2 += "\nNo living spaces available\n"
+            msg2 += colored("\nNo living spaces available\n",'yellow')
         return msg1 + msg2
 
     def print_allocations(self, filename=None):
@@ -361,22 +366,22 @@ class Amity:
         if len(all_rooms) > 0:
             for room in all_rooms:
                 if len(room.occupants) > 0:
-                    msg += room.room_name
-                    msg += "\n--------------------------- \n"
+                    msg += colored(room.room_name,'green')
+                    msg += colored("\n--------------------------- \n",'green')
                     for person in room.occupants:
-                        msg += (person.first_name + " " +
-                                person.last_name + ",")
+                        msg += colored((person.first_name + " " +
+                                person.last_name + ","),'green')
                     msg += '\n\n'
             if msg == '':
-                return 'There are no allocations in the room'
+                return colored('There are no allocations in the room','yellow')
             if filename:
                 file = open(filename, 'w')
                 file.write(msg)
                 file.close()
-                msg += '\nSuccessfully saved to ' + filename + ' textfile'
+                msg += colored('\nSuccessfully saved to ' + filename + ' textfile','green')
             return msg
         else:
-            return "No rooms available for allocations"
+            return colored("No rooms available for allocations",'yellow')
 
     def print_unallocated(self, filename=None):
         '''Check if there are people added in the office waiting list
@@ -386,24 +391,24 @@ class Amity:
          '''
         msg = ''
         if len(Amity.office_waiting_list) == 0 and len(Amity.living_space_waiting_list) == 0:
-            return "\nThere are no unallocated people\n"
+            return colored("\nThere are no unallocated people\n",'yellow')
         else:
-            msg += "People not allocated to office \n"
-            msg += "---------------------------\n"
+            msg += colored("People not allocated to office \n",'green')
+            msg += colored("---------------------------\n",'green')
             unallocated_office_space = '\n'.join(str(
                 person.person_id) + ' ' + person.first_name + ' ' + person.last_name + '\n' for person in Amity.office_waiting_list)
-            msg += unallocated_office_space
-            msg += "\nPeople not allocated to living space \n"
-            msg += "---------------------------\n"
+            msg += colored(unallocated_office_space,'green')
+            msg += colored("\nPeople not allocated to living space \n",'green')
+            msg += colored("---------------------------\n",'green')
             unallocated_living_space = '\n'.join(str(
                 person.person_id) + ' ' + person.first_name + ' ' + person.last_name + '\n' for person in Amity.living_space_waiting_list)
-            msg += unallocated_living_space
+            msg += colored(unallocated_living_space,'green')
             if filename:
                 file = open(filename, 'w')
                 file.write(unallocated_office_space)
                 file.write(unallocated_living_space)
                 file.close()
-                msg += '\n Successfully saved to ' + filename
+                msg += colored('\n Successfully saved to ' + filename,'green')
         return msg
 
     def print_all_rooms(self):
@@ -415,19 +420,19 @@ class Amity:
         msg = ''
         if len(offices) > 0:
             for office in offices:
-                msg += "OFFICES"
-                msg += "\n---------------------------\n"
-                msg += office.room_name
+                msg += colored("OFFICES",'green')
+                msg += colored("\n---------------------------\n",'green')
+                msg += colored(office.room_name,'green')
         else:
-            msg += "There are no offices\n"
+            msg += colored("There are no offices\n",'yellow')
         living_spaces = list(self.rooms['living_space'])
         if len(living_spaces) > 0:
             for living_space in living_spaces:
-                msg += "\nLIVING SPACES"
-                msg += "\n---------------------------\n"
-                msg += living_space.room_name
+                msg += colored("\nLIVING SPACES",'green')
+                msg += colored("\n---------------------------\n",'green')
+                msg += colored(living_space.room_name,'green')
         else:
-            msg += "\nThere are no livingspaces"
+            msg += colored("\nThere are no livingspaces",'yellow')
         return msg
 
     def print_room(self, room_name):
@@ -438,12 +443,12 @@ class Amity:
             if room_name == room.room_name:
                 if len(room.occupants) > 0:
                     for person in room.occupants:
-                        msg += str(person.first_name) + ' ' + \
-                            person.last_name + '\n'
+                        msg += colored(str(person.first_name) + ' ' + \
+                            person.last_name + '\n','green')
                 else:
-                    msg += "There are no occupants in the room"
+                    msg += colored("There are no occupants in the room",'yellow')
             else:
-                msg += "{} does not exist".format(room.room_name)
+                msg += colored("{} does not exist".format(room.room_name),'yellow')
         return msg
 
     def save_state(self, dbname="amity.db"):
@@ -500,7 +505,7 @@ class Amity:
                 "INSERT INTO rooms (name,type,occupants) VALUES (?,?,?)", (livingspace_name, livingspace_type, livingspace_occupants))
         conn.commit()
         conn.close()
-        return 'Data successfully exported to the Database'
+        return colored('Data successfully exported to the Database','green')
 
     def load_state(self, dbname="amity.db"):
         """
@@ -562,5 +567,5 @@ class Amity:
                         self.living_space_waiting_list.append(person)
                     break
                     conn.close()
-        msg += 'Successfully loaded data from the Database'
+        msg += colored('Successfully loaded data from the Database','green')
         return msg

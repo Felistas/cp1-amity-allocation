@@ -74,7 +74,7 @@ class Amityapp(cmd.Cmd):
     cprint(introduction, "blue", attrs=['blink'])
     intro = colored('Welcome to Amity room allocations!'
                     + ' (type help for a list of commands.)', "blue")
-    prompt = colored('Enter command>> ', 'blue')
+    prompt = 'Enter command>> '
     file = None
     amity = Amity()
 
