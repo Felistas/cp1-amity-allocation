@@ -1,0 +1,9 @@
+Having class person and room being able to be instantiated shows not using the concept of abstraction in OOP,
+check oout abc and ABCMeta classes.
+
+test naming conventionns - use format test_<function-name>_<edge_case>
+
+
+
+Also when adding a person to the new room he/she should be removed from the previous room.
+Therefore reallocation should happen only if the person had been allocated to a room whose type is the same as the new room the person is being reallocated to.
