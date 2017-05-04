@@ -19,6 +19,9 @@ https://asciinema.org/a/6i43f00ai9j9jp24jl7v7h4dw
 
 https://asciinema.org/a/dkn2cozub1nkqfntlabssghfd
 
+https://asciinema.org/a/b61lfkaknr40lwfrb9pc83jrx
+
+https://asciinema.org/a/9ffvdrpiyjl0nyis4f8twp958
 **Installation**
 
 git clone `https://github.com/Felistas/cp1-amity-allocation`
