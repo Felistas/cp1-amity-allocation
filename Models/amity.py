@@ -72,7 +72,7 @@ class Amity:
         '''
         msg = ''
         if first_name.isalpha() is False and last_name.isalpha() is False and role.isalpha():
-            msg += "\nInvalid input\n"
+            msg += colored("\nInvalid input\n","red")
         else:
             role = role.title()
             first_name = first_name.title()
@@ -113,7 +113,7 @@ class Amity:
                         msg += colored('\nYou have been added to living space waiting list \n','yellow')
             elif role == 'Staff':
                 if accommodation == 'Yes' or accommodation == "Y":
-                    msg += "\nStaff cannot get accommodation \n"
+                    msg += colored("\nStaff cannot get accommodation \n","red")
                 staff = Staff(role, first_name, last_name,  accommodation)
                 self.people.append(staff)
                 msg += colored('\n{} {} {} successfully added\n'.format(
@@ -141,8 +141,8 @@ class Amity:
                person.first_name and last_name == person.last_name]
         if len(ids) > 0:
             for id in ids:
-                msg += colored(str(id.person_id) + ' ' + id.first_name + \
-                    ' ' + id.last_name + '\n','green')
+                msg += (str(id.person_id) + ' ' + id.first_name + \
+                    ' ' + id.last_name + '\n')
         else:
             msg += colored("Person does not exist",'yellow')
         return msg
@@ -318,8 +318,8 @@ class Amity:
                     last_name = l[1]
                     role = l[2]
                     accommodation = (l[3] if len(l) > 3 else "No")
-                    msg += self.add_person(role, first_name,
-                                           last_name, accommodation)
+                    msg += colored(self.add_person(role, first_name,
+                                           last_name, accommodation),"green")
         except:
             msg += colored('File does not exist','red')
         return msg
@@ -419,18 +419,18 @@ class Amity:
         offices = list(Amity.rooms['office'])
         msg = ''
         if len(offices) > 0:
+            msg += colored("OFFICES",'green')
+            msg += colored("\n---------------------------\n",'green')
             for office in offices:
-                msg += colored("OFFICES",'green')
-                msg += colored("\n---------------------------\n",'green')
-                msg += colored(office.room_name,'green')
+                msg += colored(office.room_name + '\n','green')
         else:
             msg += colored("There are no offices\n",'yellow')
         living_spaces = list(self.rooms['living_space'])
         if len(living_spaces) > 0:
+            msg += colored("\nLIVING SPACES",'green')
+            msg += colored("\n---------------------------\n",'green')
             for living_space in living_spaces:
-                msg += colored("\nLIVING SPACES",'green')
-                msg += colored("\n---------------------------\n",'green')
-                msg += colored(living_space.room_name,'green')
+                msg += colored(living_space.room_name + '\n','green')
         else:
             msg += colored("\nThere are no livingspaces",'yellow')
         return msg
@@ -540,7 +540,7 @@ class Amity:
                 livingspace_occupants = []
                 for occupant in room[3][:-1].split(' '):
                     for person in self.people:
-                        if person.id == int(occupant):
+                        if person.id == str(occupant):
                             livingspace_occupants.append(person)
                 livingspace.occupants = livingspace_occupants
                 self.rooms['living_space'].append(livingspace)

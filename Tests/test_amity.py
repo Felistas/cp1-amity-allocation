@@ -106,11 +106,13 @@ class ModelsTest(unittest.TestCase):
 
     def test_cannot_print_id_of_non_existent_person(self):
         """Asserts that a non existent person cannot have person id"""
+        self.amity.people = []
         person = self.amity.print_person_id("ganla", "janla")
-        self.assertEqual('Person does not exist', person)
+        self.assertIn('Person does not exist', person)
 
     def test_cannot_reallocate_a_non_existent_person(self):
         """Asserts cannot reallocate a person who does not exist"""
+        self.amity.people = []
         reallocate_person = self.amity.reallocate_person('1233', 'tsavo')
         self.assertIn('1233 does not exist', reallocate_person)
 
@@ -139,10 +141,13 @@ class ModelsTest(unittest.TestCase):
         """Assert cannot reallocate to different room type"""
         self.amity.rooms['living_space'] = []
         self.amity.rooms['office'] = []
+        self.amity.people=[]
         self.amity.create_room("office", ["narnia"])
         new_living_space = self.amity.create_room("livingspace", ["php"])
         fellow = self.amity.add_person("fellow", "olivia", "onyango")
         fellow_id = self.amity.print_person_id("olivia", "onyango").split(' ')
+        print(fellow_id[0])
+        print(self.amity.people[0].person_id)
         reallocate_fellow = self.amity.reallocate_person(fellow_id[0], 'php')
         self.assertIn('Cannot reallocate from one room type to another', reallocate_fellow)
 
@@ -177,9 +182,7 @@ class ModelsTest(unittest.TestCase):
         self.amity.rooms['office'] = []
         self.amity.people = []
         self.amity.create_room("office", ["narnia"])
-        print(self.amity.rooms['office'][0].occupants)
         self.amity.add_person("fellow", "ivan", "pycharm")
-        print(self.amity.rooms['office'][0].occupants[0].first_name)
         self.amity.create_room("office", ["meru"])
         fellow_id = self.amity.print_person_id("ivan", "pycharm").split(' ')
         reallocate_fellow = self.amity.reallocate_person(fellow_id[0], 'meru')
